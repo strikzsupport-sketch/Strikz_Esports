@@ -296,11 +296,11 @@
     // ==========================================
     const authManager = {
         getUser: () => {
-            const data = localStorage.getItem('strikz_user_profile');
+            const data = localStorage.getItem('strikz_user_profile') || sessionStorage.getItem('strikz_user_profile');
             return data ? JSON.parse(data) : null;
         },
         isLoggedIn: () => {
-            return localStorage.getItem('strikz_jwt_token') !== null;
+            return localStorage.getItem('strikz_jwt_token') !== null || sessionStorage.getItem('strikz_jwt_token') !== null;
         },
         loginUser: async (usernameOrEmail, password) => {
             const res = await fetch('/api/v1/auth/login', {
@@ -389,6 +389,7 @@
             localStorage.removeItem('strikz_user_profile');
             sessionStorage.removeItem('strikz_admin_logged_in');
             sessionStorage.removeItem('strikz_jwt_token');
+            sessionStorage.removeItem('strikz_user_profile');
             updateAuthUI();
             router();
             window.dispatchEvent(new CustomEvent('strikz-auth-changed', { detail: null }));

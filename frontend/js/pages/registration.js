@@ -128,6 +128,22 @@
             const defaultName = user ? user.username : '';
             const defaultEmail = user ? user.email : '';
 
+            if (tourney.category !== 'Solo' && !userTeam) {
+                formMount.innerHTML = `
+                    <div class="glass-panel text-center" style="padding: 40px; border-color: var(--neon-orange-border); background:rgba(255, 94, 0, 0.02); display:flex; flex-direction:column; align-items:center; gap:15px;">
+                        <i class="fa-solid fa-users-slash" style="font-size: 58px; color: var(--neon-orange); filter: drop-shadow(0 0 12px var(--neon-orange-glow));"></i>
+                        <h4 class="font-orbitron" style="font-size: 16px; color:#fff;">NO COMPETITIVE SQUAD DETECTED</h4>
+                        <p style="font-size: 13.5px; color: var(--text-silver); max-width: 500px; line-height: 1.6; margin: 0 auto;">
+                            It is mandatory to create your Esports Team roster in the <strong>My Team</strong> panel first before you can register for team or duo championships.
+                        </p>
+                        <a href="#/myteam" class="cta-button btn-neon-orange" style="margin-top: 15px; padding: 10px 24px;">
+                            <i class="fa-solid fa-users-gear"></i> INITIALIZE SQUAD NOW
+                        </a>
+                    </div>
+                `;
+                return;
+            }
+
             if (tourney.category === 'Solo') {
                 if (tourney.soloRegistrationEnabled === false) {
                     formMount.innerHTML = `
@@ -221,6 +237,14 @@
             else if (tourney.category === 'Duo') {
                 formMount.innerHTML = `
                     <form id="reg-duo-form" onsubmit="return false;">
+                        
+                        ${userTeam ? `
+                            <div style="background: rgba(255, 230, 0, 0.05); border: 1px solid var(--neon-yellow-border); border-radius: 4px; padding: 12px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap:wrap; gap:10px;">
+                                <span style="font-size: 13px; color:#fff;"><i class="fa-solid fa-users-gear"></i> Quick registration: Autofill roster with your saved squad <strong>${userTeam.name}</strong>?</span>
+                                <button type="button" class="cta-button btn-neon-yellow" id="btn-autofill-duo" style="padding: 6px 14px; font-size:11px; font-weight:800; color:#000 !important;">AUTO-FILL ROSTER</button>
+                            </div>
+                        ` : ''}
+
                         <div class="form-group">
                             <label>DUO TEAM / SQUAD NAME</label>
                             <input type="text" id="reg-duo-team" placeholder="E.g. Double Trouble" required style="color:#fff;">
@@ -274,6 +298,29 @@
                         </button>
                     </form>
                 `;
+
+                // Autofill logic
+                const autofillDuoBtn = document.getElementById('btn-autofill-duo');
+                if (autofillDuoBtn) {
+                    autofillDuoBtn.onclick = function() {
+                        document.getElementById('reg-duo-team').value = userTeam.name;
+                        
+                        const duoTags = document.querySelectorAll('.duo-member-tag');
+                        const duoReals = document.querySelectorAll('.duo-member-real');
+                        const duoUids = document.querySelectorAll('.duo-member-uid');
+                        const duoRoles = document.querySelectorAll('.duo-member-role');
+
+                        userTeam.members.forEach((m, idx) => {
+                            if (idx < 2) {
+                                duoTags[idx].value = m.name;
+                                duoReals[idx].value = m.real_name || m.name;
+                                duoUids[idx].value = m.game_uid;
+                                duoRoles[idx].value = m.role;
+                            }
+                        });
+                        if (window.strikzPlayClickSound) window.strikzPlayClickSound();
+                    };
+                }
 
                 const form = document.getElementById('reg-duo-form');
                 form.onsubmit = async function(e) {

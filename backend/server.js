@@ -30,12 +30,13 @@ app.use(helmet({
     contentSecurityPolicy: {
         directives: {
             defaultSrc: ["'self'"],
-            scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
-            styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://cdnjs.cloudflare.com"],
+            scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://accounts.google.com", "https://*.google.com"],
+            styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://cdnjs.cloudflare.com", "https://accounts.google.com"],
             fontSrc: ["'self'", "https://fonts.gstatic.com", "https://cdnjs.cloudflare.com"],
             imgSrc: ["'self'", "data:", "https://api.dicebear.com", "https://upload.wikimedia.org", "http:", "https:"],
             mediaSrc: ["'self'", "https://assets.mixkit.co", "http:", "https:"],
-            connectSrc: ["'self'", "http:", "https:"]
+            connectSrc: ["'self'", "http:", "https:", "https://accounts.google.com"],
+            frameSrc: ["'self'", "https://accounts.google.com", "https://*.google.com"]
         }
     },
     crossOriginEmbedderPolicy: false
