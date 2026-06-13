@@ -51,23 +51,23 @@
                         
                         <div class="player-stats-row">
                             <div>
-                                <div class="player-stat-val">${player.stats.kd}</div>
+                                <div class="player-stat-val">${player.kd}</div>
                                 <div class="player-stat-lbl">K/D Ratio</div>
                             </div>
                             <div>
-                                <div class="player-stat-val">${player.stats.hs}</div>
+                                <div class="player-stat-val">${player.hs}</div>
                                 <div class="player-stat-lbl">Headshot %</div>
                             </div>
                             <div>
-                                <div class="player-stat-val">${player.stats.matches}</div>
+                                <div class="player-stat-val">${player.matches}</div>
                                 <div class="player-stat-lbl">Matches</div>
                             </div>
                         </div>
 
                         <div class="player-socials">
-                            <a href="${player.socials.twitter}" class="player-social-icon" title="Twitter"><i class="fa-brands fa-x-twitter"></i></a>
-                            <a href="${player.socials.youtube}" class="player-social-icon" title="YouTube"><i class="fa-brands fa-youtube"></i></a>
-                            <a href="${player.socials.instagram}" class="player-social-icon" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                            <a href="${player.twitter}" class="player-social-icon" title="Twitter"><i class="fa-brands fa-x-twitter"></i></a>
+                            <a href="${player.youtube}" class="player-social-icon" title="YouTube"><i class="fa-brands fa-youtube"></i></a>
+                            <a href="${player.instagram}" class="player-social-icon" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
                         </div>
                     </div>
                 </div>

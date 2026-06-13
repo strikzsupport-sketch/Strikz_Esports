@@ -556,6 +556,8 @@
     const registerContainer = document.getElementById('register-view-container');
     const forgotContainer = document.getElementById('forgot-view-container');
     const resetContainer = document.getElementById('reset-view-container');
+    const googleAccountsContainer = document.getElementById('google-accounts-container');
+    const googleAccountsList = document.getElementById('google-accounts-list');
 
     const settingsModal = document.getElementById('settings-modal');
     const settingsUserInput = document.getElementById('settings-input-user');
@@ -565,6 +567,7 @@
         if (registerContainer) registerContainer.classList.add('hidden');
         if (forgotContainer) forgotContainer.classList.add('hidden');
         if (resetContainer) resetContainer.classList.add('hidden');
+        if (googleAccountsContainer) googleAccountsContainer.classList.add('hidden');
     }
 
     function showRegister() {
@@ -572,6 +575,7 @@
         if (registerContainer) registerContainer.classList.remove('hidden');
         if (forgotContainer) forgotContainer.classList.add('hidden');
         if (resetContainer) resetContainer.classList.add('hidden');
+        if (googleAccountsContainer) googleAccountsContainer.classList.add('hidden');
     }
 
     function showForgot() {
@@ -579,6 +583,7 @@
         if (registerContainer) registerContainer.classList.add('hidden');
         if (forgotContainer) forgotContainer.classList.remove('hidden');
         if (resetContainer) resetContainer.classList.add('hidden');
+        if (googleAccountsContainer) googleAccountsContainer.classList.add('hidden');
     }
 
     function showReset() {
@@ -586,6 +591,7 @@
         if (registerContainer) registerContainer.classList.add('hidden');
         if (forgotContainer) forgotContainer.classList.add('hidden');
         if (resetContainer) resetContainer.classList.remove('hidden');
+        if (googleAccountsContainer) googleAccountsContainer.classList.add('hidden');
     }
 
     function openLoginModal() {
@@ -620,7 +626,7 @@
     }
 
     function simulateGoogleSignIn() {
-        if (!loginContainer || !loginLoading || !progressFill) return;
+        if (!loginContainer || !loginLoading || !progressFill || !googleAccountsContainer || !googleAccountsList) return;
         
         loginContainer.classList.add('hidden');
         loginLoading.classList.remove('hidden');
@@ -631,16 +637,58 @@
             progressFill.style.width = width + '%';
             if (width >= 100) {
                 clearInterval(interval);
-                try {
-                    const randGamer = mockGamers[Math.floor(Math.random() * mockGamers.length)];
-                    await authManager.googleLogin(randGamer.name, randGamer.email, randGamer.avatar);
-                    closeLoginModal();
-                    playSound(successSfx);
-                } catch (err) {
-                    alert("Google auth portal failed: " + err.message);
-                    showLogin();
-                    loginLoading.classList.add('hidden');
-                }
+                
+                loginLoading.classList.add('hidden');
+                googleAccountsContainer.classList.remove('hidden');
+                
+                // Render list
+                googleAccountsList.innerHTML = mockGamers.map((gamer, idx) => `
+                    <div class="google-account-card" data-idx="${idx}" style="display: flex; align-items: center; gap: 15px; background: rgba(255,255,255,0.02); border: 1px solid var(--glass-border); padding: 10px 15px; border-radius: 4px; cursor: pointer; transition: all 0.2s ease; margin-bottom: 8px;">
+                        <img src="${gamer.avatar}" style="width: 32px; height: 32px; border-radius: 50%; border: 1.5px solid var(--glass-border); padding: 2px; background: rgba(0,0,0,0.5);">
+                        <div style="flex-grow: 1; text-align: left;">
+                            <div style="color: #fff; font-weight: 700; font-size: 13px; font-family: var(--font-header); letter-spacing: 0.05em;">${gamer.name}</div>
+                            <div style="color: var(--text-dim); font-size: 11px;">${gamer.email}</div>
+                        </div>
+                        <i class="fa-solid fa-chevron-right" style="color: var(--neon-orange); font-size: 12px;"></i>
+                    </div>
+                `).join('');
+
+                // Bind hover and click events
+                googleAccountsList.querySelectorAll('.google-account-card').forEach(card => {
+                    card.style.transition = 'all 0.2s ease';
+                    card.addEventListener('mouseenter', () => {
+                        card.style.background = 'rgba(255, 94, 0, 0.06)';
+                        card.style.borderColor = 'var(--neon-orange-border)';
+                        card.style.boxShadow = '0 0 10px rgba(255, 94, 0, 0.1)';
+                    });
+                    card.addEventListener('mouseleave', () => {
+                        card.style.background = 'rgba(255,255,255,0.02)';
+                        card.style.borderColor = 'var(--glass-border)';
+                        card.style.boxShadow = 'none';
+                    });
+                    card.onclick = async function() {
+                        const idx = this.dataset.idx;
+                        const gamer = mockGamers[idx];
+                        
+                        // Show loader again briefly
+                        googleAccountsContainer.classList.add('hidden');
+                        loginLoading.classList.remove('hidden');
+                        const loaderText = document.querySelector('#login-loading-container .loader-text');
+                        if (loaderText) loaderText.textContent = "AUTHORIZING GAMER...";
+                        
+                        try {
+                            await authManager.googleLogin(gamer.name, gamer.email, gamer.avatar);
+                            closeLoginModal();
+                            playSound(successSfx);
+                        } catch (err) {
+                            alert("Google auth portal failed: " + err.message);
+                            showLogin();
+                            loginLoading.classList.add('hidden');
+                        } finally {
+                            if (loaderText) loaderText.textContent = "CONNECTING TO GOOGLE SECURE PORTAL...";
+                        }
+                    };
+                });
             }
         }, 40);
     }
