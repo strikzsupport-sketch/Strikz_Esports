@@ -841,7 +841,7 @@
                     closeLoginModal();
                     playSound(successSfx);
                 } catch (err) {
-                    alert("Access Denied: " + err.message);
+                    alert(err.message);
                 }
             });
         }

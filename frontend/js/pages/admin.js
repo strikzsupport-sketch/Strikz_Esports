@@ -4,8 +4,25 @@
 
 (function() {
     function renderAdmin(container) {
-        // Session validation
+        // Session validation — check sessionStorage flag OR localStorage admin profile
         let isLoggedIn = sessionStorage.getItem('strikz_admin_logged_in') === 'true';
+
+        if (!isLoggedIn) {
+            // Also check if already logged in as admin via localStorage
+            try {
+                const storedProfile = localStorage.getItem('strikz_user_profile');
+                if (storedProfile) {
+                    const profile = JSON.parse(storedProfile);
+                    const token = localStorage.getItem('strikz_jwt_token');
+                    if (profile.role === 'admin' && token) {
+                        // Sync sessionStorage with existing admin login
+                        sessionStorage.setItem('strikz_admin_logged_in', 'true');
+                        sessionStorage.setItem('strikz_jwt_token', token);
+                        isLoggedIn = true;
+                    }
+                }
+            } catch(e) { /* ignore parse errors */ }
+        }
 
         if (!isLoggedIn) {
             renderLoginScreen(container);
@@ -40,22 +57,58 @@
         `;
 
         const form = document.getElementById('admin-login-form');
+        const submitBtn = form.querySelector('button[type="submit"]');
+
         form.onsubmit = async function(e) {
             if (e) e.preventDefault();
             const user = document.getElementById('admin-user').value.trim();
             const pass = document.getElementById('admin-pass').value.trim();
 
+            if (!user || !pass) {
+                alert("Please enter both username and password.");
+                return;
+            }
+
+            if (submitBtn) { submitBtn.disabled = true; submitBtn.querySelector('.btn-text').textContent = 'AUTHENTICATING...'; }
+
             try {
-                const userProfile = await window.strikzAuth.loginUser(user, pass);
-                if (userProfile.role === 'admin') {
-                    if (window.strikzPlaySuccessSound) window.strikzPlaySuccessSound();
-                    window.location.reload();
-                } else {
-                    window.strikzAuth.logout();
-                    alert("ACCESS DENIED: You do not have administrator privileges.");
+                // Direct fetch — bypasses any window.strikzAuth initialization race
+                const res = await fetch('/api/v1/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ usernameOrEmail: user, password: pass })
+                });
+                const json = await res.json();
+
+                if (!res.ok) {
+                    throw new Error(json.message || 'Invalid credentials');
                 }
+
+                if (json.user.role !== 'admin') {
+                    throw new Error('You do not have administrator privileges.');
+                }
+
+                // Persist auth state
+                localStorage.setItem('strikz_jwt_token', json.token);
+                localStorage.setItem('strikz_user_profile', JSON.stringify(json.user));
+                sessionStorage.setItem('strikz_admin_logged_in', 'true');
+                sessionStorage.setItem('strikz_jwt_token', json.token);
+
+                if (window.strikzPlaySuccessSound) window.strikzPlaySuccessSound();
+
+                // Re-render this page via SPA router (no full reload needed)
+                if (window.strikzAuth && window.strikzAuth.getUser) {
+                    // Sync auth manager state by triggering auth change event
+                    window.dispatchEvent(new CustomEvent('strikz-auth-changed', { detail: json.user }));
+                }
+
+                // Navigate away and back to force a clean re-render of admin dashboard
+                window.location.hash = '#/';
+                setTimeout(() => { window.location.hash = '#/admin'; }, 100);
+
             } catch (err) {
-                alert("ACCESS DENIED: " + err.message);
+                alert("Login Failed: " + err.message);
+                if (submitBtn) { submitBtn.disabled = false; submitBtn.querySelector('.btn-text').textContent = 'INITIALIZE SYSTEM SECURE'; }
             }
         };
     }
