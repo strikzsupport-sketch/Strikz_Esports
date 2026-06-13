@@ -107,7 +107,10 @@
                     await dbPromise;
 
                     try {
-                        renderer(appContent);
+                        const result = renderer(appContent);
+                        if (result instanceof Promise) {
+                            await result;
+                        }
                         bindSoundEffects();
                         updateActiveNav(path);
                         initScrollAnimations();
@@ -132,13 +135,16 @@
                     setTimeout(tick, delay);
                 }
             };
-
+ 
             setTimeout(tick, 60);
         } else {
             // Fallback
-            window.strikzDb.init().then(() => {
+            window.strikzDb.init().then(async () => {
                 try {
-                    renderer(appContent);
+                    const result = renderer(appContent);
+                    if (result instanceof Promise) {
+                        await result;
+                    }
                     bindSoundEffects();
                     updateActiveNav(path);
                     initScrollAnimations();
@@ -782,6 +788,8 @@
             });
         });
     }
+    window.strikzInitScrollAnimations = initScrollAnimations;
+    window.strikzInitSpotlightEffect = initSpotlightEffect;
 
     // Initial Bindings
     window.addEventListener('hashchange', router);

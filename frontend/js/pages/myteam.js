@@ -64,6 +64,9 @@
                 </div>
             `;
         }
+
+        if (window.strikzInitScrollAnimations) window.strikzInitScrollAnimations();
+        if (window.strikzInitSpotlightEffect) window.strikzInitSpotlightEffect();
     }
 
     // PENDING TEAM INVITATIONS SCREEN
@@ -156,9 +159,11 @@
                 btnShow.textContent = 'CREATE SQUAD';
             }
         };
+
+        if (window.strikzInitScrollAnimations) window.strikzInitScrollAnimations();
+        if (window.strikzInitSpotlightEffect) window.strikzInitSpotlightEffect();
     }
 
-    // CREATE TEAM SCREEN
     function renderCreateTeamForm(container, user) {
         container.innerHTML = `
             <section class="container bg-section-black reveal" style="padding-top: 40px; margin-bottom: 80px; max-width: 800px;">
@@ -171,11 +176,15 @@
             </section>
         `;
         bindCreateTeamForm(user, container);
+        if (window.strikzInitScrollAnimations) window.strikzInitScrollAnimations();
+        if (window.strikzInitSpotlightEffect) window.strikzInitSpotlightEffect();
     }
 
     function renderCreateTeamFormInner(mountElement, user, container) {
         mountElement.innerHTML = getCreateTeamFormHTML(user);
         bindCreateTeamForm(user, container);
+        if (window.strikzInitScrollAnimations) window.strikzInitScrollAnimations();
+        if (window.strikzInitSpotlightEffect) window.strikzInitSpotlightEffect();
     }
 
     function getCreateTeamFormHTML(user) {
@@ -433,6 +442,9 @@
                 }
             };
         });
+
+        if (window.strikzInitScrollAnimations) window.strikzInitScrollAnimations();
+        if (window.strikzInitSpotlightEffect) window.strikzInitSpotlightEffect();
     }
 
     // Attach to global window
