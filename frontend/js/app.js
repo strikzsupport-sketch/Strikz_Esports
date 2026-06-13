@@ -620,19 +620,35 @@
 
     async function renderGoogleButton() {
         await initGoogleSignIn();
+        const btnContainer = document.getElementById("google-signin-btn-container");
+        if (!btnContainer) return;
+
         if (googleInitialized) {
-            const btnContainer = document.getElementById("google-signin-btn-container");
-            if (btnContainer) {
-                google.accounts.id.renderButton(
-                    btnContainer,
-                    { 
-                        theme: "filled_blue", 
-                        size: "large",
-                        text: "signin_with",
-                        shape: "rectangular",
-                        width: btnContainer.offsetWidth || 250
-                    }
-                );
+            btnContainer.innerHTML = '';
+            google.accounts.id.renderButton(
+                btnContainer,
+                { 
+                    theme: "filled_blue", 
+                    size: "large",
+                    text: "signin_with",
+                    shape: "rectangular",
+                    width: btnContainer.offsetWidth || 250
+                }
+            );
+        } else {
+            if (!googleClientId) {
+                btnContainer.innerHTML = `
+                    <div style="color: #ff5e00; font-size: 11px; text-align: center; border: 1px dashed #ff5e00; padding: 8px; border-radius: 4px; background: rgba(255, 94, 0, 0.05); width: 100%;">
+                        <i class="fa-solid fa-triangle-exclamation"></i> Google OAuth Client ID pending in backend configurations (.env)
+                    </div>
+                `;
+            } else if (typeof google === 'undefined' || !google.accounts) {
+                btnContainer.innerHTML = `
+                    <div style="color: var(--text-dim); font-size: 12px; text-align: center; padding: 8px;">
+                        <i class="fa-solid fa-spinner fa-spin"></i> Connecting to Google Auth...
+                    </div>
+                `;
+                setTimeout(renderGoogleButton, 250);
             }
         }
     }
