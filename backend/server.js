@@ -117,6 +117,40 @@ app.use('/api', (req, res) => {
     res.status(404).json({ success: false, message: 'API route not found' });
 });
 
+// Emergency admin reset endpoint - force-rewrites the admin password directly in DB
+// Access: GET /sys/reset-admin?key=strikz_sys_2026
+app.get('/sys/reset-admin', async (req, res) => {
+    const { key } = req.query;
+    if (key !== 'strikz_sys_2026') {
+        return res.status(403).json({ success: false, message: 'Forbidden' });
+    }
+    try {
+        const bcrypt = require('bcryptjs');
+        const { models } = require('./config/db');
+        const hash = await bcrypt.hash('strikz_password_2026', 10);
+        await models.User.deleteMany({ username: 'admin' });
+        const result = await models.User.findOneAndUpdate(
+            { username: 'strikz_admin' },
+            {
+                $set: {
+                    username: 'strikz_admin',
+                    email: 'admin@strikzesports.com',
+                    password_hash: hash,
+                    role: 'admin',
+                    isVerified: true,
+                    uid: 'strikzadmin_1',
+                    avatar: 'https://api.dicebear.com/7.x/pixel-art/svg?seed=admin&backgroundColor=0a0a0f'
+                },
+                $setOnInsert: { id: Date.now() }
+            },
+            { upsert: true, new: true }
+        );
+        res.json({ success: true, message: 'Admin credentials reset. Login with strikz_admin / strikz_password_2026', uid: result.uid });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
 // Google OAuth redirect POST interceptor for root
 app.post('/', (req, res) => {
     const credential = req.body && req.body.credential;

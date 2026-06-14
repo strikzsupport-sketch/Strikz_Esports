@@ -162,37 +162,53 @@ const upsertMany = async (Model, docs) => {
 };
 
 const seedDatabase = async (models) => {
-    // ALWAYS force-recreate admin user with correct credentials on every startup.
-    // This ensures any stale password hashes in the live DB are overwritten.
+    // ALWAYS force-update admin credentials on every startup using upsert.
+    // Using findOneAndUpdate avoids duplicate-key errors from id conflicts.
     try {
         const bcrypt = require('bcryptjs');
         const ADMIN_USERNAME = 'strikz_admin';
+        const ADMIN_EMAIL   = 'admin@strikzesports.com';
         const ADMIN_PASSWORD = 'strikz_password_2026';
         const adminHash = await bcrypt.hash(ADMIN_PASSWORD, 10);
 
-        // Wipe both the old 'admin' account and any existing 'strikz_admin'
-        await models.User.deleteMany({ username: { $in: ['admin', ADMIN_USERNAME] } });
+        // Remove legacy 'admin' account if it still exists
+        await models.User.deleteMany({ username: 'admin' });
 
-        // Re-create fresh with correct hash
-        let uid = 'admin_73';
-        let exists = await models.User.exists({ uid });
-        while (exists) {
-            uid = 'admin_' + Math.floor(10 + Math.random() * 900);
-            exists = await models.User.exists({ uid });
+        // Build a unique uid for admin if one doesn't exist yet
+        let adminUid = 'strikzadmin_1';
+        const existing = await models.User.findOne({ username: ADMIN_USERNAME }).lean();
+        if (existing && existing.uid) {
+            adminUid = existing.uid; // keep existing uid so it doesn't change
+        } else {
+            let uidExists = await models.User.exists({ uid: adminUid });
+            let tries = 0;
+            while (uidExists && tries < 20) {
+                adminUid = 'strikzadmin_' + Math.floor(10 + Math.random() * 900);
+                uidExists = await models.User.exists({ uid: adminUid });
+                tries++;
+            }
         }
-        await models.User.create({
-            id: 1,
-            uid,
-            username: ADMIN_USERNAME,
-            email: 'admin@strikzesports.com',
-            password_hash: adminHash,
-            role: 'admin',
-            avatar: 'https://api.dicebear.com/7.x/pixel-art/svg?seed=admin&backgroundColor=0a0a0f',
-            isVerified: true
-        });
-        console.log(`[SEED] Admin user "${ADMIN_USERNAME}" created/reset successfully.`);
+
+        // Upsert by username - always overwrites hash and role
+        await models.User.findOneAndUpdate(
+            { username: ADMIN_USERNAME },
+            {
+                $set: {
+                    username:      ADMIN_USERNAME,
+                    email:         ADMIN_EMAIL,
+                    password_hash: adminHash,
+                    role:          'admin',
+                    isVerified:    true,
+                    uid:           adminUid,
+                    avatar:        'https://api.dicebear.com/7.x/pixel-art/svg?seed=admin&backgroundColor=0a0a0f'
+                },
+                $setOnInsert: { id: Date.now() }  // only set id on brand new insert
+            },
+            { upsert: true, new: true }
+        );
+        console.log(`[SEED] Admin "${ADMIN_USERNAME}" credentials ensured OK.`);
     } catch (err) {
-        console.error('[SEED] Failed to seed default admin:', err.message);
+        console.error('[SEED] Failed to seed admin:', err.message);
     }
 
     const hasSettings = await models.Setting.exists({ id: 1 });
