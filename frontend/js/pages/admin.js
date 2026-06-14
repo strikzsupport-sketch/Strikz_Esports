@@ -2431,17 +2431,6 @@
         };
     }
 
-            try {
-                await window.strikzDb.updateSettings(updated);
-                alert("Global site settings updated successfully!");
-                
-                if (window.strikzPlaySuccessSound) window.strikzPlaySuccessSound();
-            } catch (err) {
-                alert("Error updating settings: " + err.message);
-            }
-        };
-    }
-
     // 13. EMAIL SYSTEM CONTROL CENTER Tab Panel
     async function renderEmailTab(mount, db) {
         const token = localStorage.getItem('strikz_jwt_token');
