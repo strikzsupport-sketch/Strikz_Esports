@@ -428,6 +428,83 @@ const resolveTicket = async (req, res, next) => {
     } catch (err) { next(err); }
 };
 
+// ──────────────────────────────────────────────────────
+// USER ACCOUNT MANAGEMENT (Admin)
+// ──────────────────────────────────────────────────────
+
+// List all user accounts (exclude password hash)
+const getAllUsers = async (req, res, next) => {
+    try {
+        const page   = Math.max(1, parseInt(req.query.page)  || 1);
+        const limit  = Math.min(100, parseInt(req.query.limit) || 50);
+        const search = req.query.search ? req.query.search.trim() : '';
+
+        const filter = search
+            ? { $or: [
+                { username: { $regex: search, $options: 'i' } },
+                { email:    { $regex: search, $options: 'i' } },
+                { uid:      { $regex: search, $options: 'i' } }
+              ] }
+            : {};
+
+        const [users, total] = await Promise.all([
+            models.User.find(filter)
+                .select('-password_hash -reset_token -reset_token_expiry')
+                .sort({ created_at: -1 })
+                .skip((page - 1) * limit)
+                .limit(limit)
+                .lean(),
+            models.User.countDocuments(filter)
+        ]);
+
+        res.json({ success: true, users, total, page, pages: Math.ceil(total / limit) });
+    } catch (err) { next(err); }
+};
+
+// Verify a user account
+const verifyUser = async (req, res, next) => {
+    try {
+        const userId = Number(req.params.id);
+        const user = await models.User.findOne({ id: userId });
+        if (!user) { res.status(404); return next(new Error('User not found')); }
+        if (user.role === 'admin') { res.status(403); return next(new Error('Cannot modify admin accounts')); }
+        await models.User.updateOne({ id: userId }, { $set: { isVerified: true, status: 'active' } });
+        await logAdminAction(req, 'VERIFY_USER', { userId, username: user.username });
+        res.json({ success: true, message: `Account "${user.username}" verified successfully.` });
+    } catch (err) { next(err); }
+};
+
+// Toggle suspend / reactivate a user account
+const suspendUser = async (req, res, next) => {
+    try {
+        const userId = Number(req.params.id);
+        const user = await models.User.findOne({ id: userId });
+        if (!user) { res.status(404); return next(new Error('User not found')); }
+        if (user.role === 'admin') { res.status(403); return next(new Error('Cannot suspend admin accounts')); }
+        const newStatus = user.status === 'suspended' ? 'active' : 'suspended';
+        await models.User.updateOne({ id: userId }, { $set: { status: newStatus } });
+        await logAdminAction(req, 'SUSPEND_USER', { userId, username: user.username, newStatus });
+        res.json({
+            success: true,
+            message: `Account "${user.username}" ${newStatus === 'suspended' ? 'suspended' : 'reactivated'} successfully.`,
+            status: newStatus
+        });
+    } catch (err) { next(err); }
+};
+
+// Permanently delete a user account
+const deleteUser = async (req, res, next) => {
+    try {
+        const userId = Number(req.params.id);
+        const user = await models.User.findOne({ id: userId });
+        if (!user) { res.status(404); return next(new Error('User not found')); }
+        if (user.role === 'admin') { res.status(403); return next(new Error('Cannot delete admin accounts')); }
+        await models.User.deleteOne({ id: userId });
+        await logAdminAction(req, 'DELETE_USER', { userId, username: user.username, email: user.email });
+        res.json({ success: true, message: `Account "${user.username}" permanently deleted.` });
+    } catch (err) { next(err); }
+};
+
 module.exports = {
     getStats,
     getRegistrations,
@@ -458,5 +535,9 @@ module.exports = {
     deleteManagement,
     updateSettings,
     getTickets,
-    resolveTicket
+    resolveTicket,
+    getAllUsers,
+    verifyUser,
+    suspendUser,
+    deleteUser
 };

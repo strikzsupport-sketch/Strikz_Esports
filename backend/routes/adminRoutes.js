@@ -33,6 +33,12 @@ const {
     getTickets,
     resolveTicket
 } = require('../controllers/adminController');
+const {
+    getAllUsers,
+    verifyUser,
+    suspendUser,
+    deleteUser
+} = require('../controllers/adminController');
 
 const {
     getEmailSettings,
@@ -106,6 +112,12 @@ router.put('/settings', updateSettings);
 // Chatbot ticket inbox
 router.get('/tickets', getTickets);
 router.put('/tickets/:id/resolve', resolveTicket);
+
+// User Account Management
+router.get('/users', getAllUsers);
+router.put('/users/:id/verify', verifyUser);
+router.put('/users/:id/suspend', suspendUser);
+router.delete('/users/:id', deleteUser);
 
 // Email System Admin routes
 router.get('/email/settings', getEmailSettings);

@@ -179,6 +179,7 @@
                         <button class="admin-tab-btn" data-tab="settings"><i class="fa-solid fa-gears"></i> Website Settings</button>
                         <button class="admin-tab-btn" data-tab="chatbot"><i class="fa-solid fa-comments"></i> Chatbot Inbox</button>
                         <button class="admin-tab-btn" data-tab="email"><i class="fa-solid fa-envelope"></i> Email Center</button>
+                        <button class="admin-tab-btn" data-tab="players" style="border-top: 1px solid rgba(0,240,255,0.15); margin-top: 6px; padding-top: 10px; color: var(--neon-cyan);"><i class="fa-solid fa-users-gear"></i> Players</button>
                     </aside>
 
                     <!-- Main Dynamic Panels -->
@@ -271,6 +272,9 @@
                 else if (tab === 'email') {
                     db = await window.strikzDb.fetchSnapshot();
                     renderEmailTab(panelContent, db);
+                }
+                else if (tab === 'players') {
+                    await renderPlayersTab(panelContent, 1, '');
                 }
             } catch (err) {
                 console.error("Error loading admin tab " + tab + ":", err);
@@ -3076,6 +3080,168 @@
                 };
             });
         }
+    }
+
+    // ──────────────────────────────────────────────────────
+    // PLAYERS / USER MANAGEMENT TAB
+    // ──────────────────────────────────────────────────────
+    async function renderPlayersTab(mount, page = 1, search = '') {
+        mount.innerHTML = `<div style="padding:30px;text-align:center;color:var(--neon-cyan);"><i class="fa-solid fa-spinner fa-spin" style="font-size:28px;"></i><br><br>Loading player accounts...</div>`;
+
+        const token = localStorage.getItem('strikz_jwt_token') || sessionStorage.getItem('strikz_jwt_token');
+        let data;
+        try {
+            const params = new URLSearchParams({ page, limit: 30 });
+            if (search) params.set('search', search);
+            const res = await fetch(`/api/v1/admin/users?${params}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            data = await res.json();
+            if (!res.ok) throw new Error(data.message || 'Failed to load users');
+        } catch (err) {
+            mount.innerHTML = `<div style="padding:30px;color:var(--neon-orange);text-align:center;"><i class="fa-solid fa-triangle-exclamation"></i> ${err.message}</div>`;
+            return;
+        }
+
+        const { users = [], total = 0, pages = 1 } = data;
+
+        const statusBadge = (u) => {
+            if (u.role === 'admin') return `<span style="background:rgba(255,94,0,0.15);color:#ff5e00;border:1px solid #ff5e00;border-radius:12px;padding:2px 10px;font-size:10px;font-weight:700;">ADMIN</span>`;
+            if (u.status === 'suspended') return `<span style="background:rgba(239,68,68,0.15);color:#ef4444;border:1px solid #ef4444;border-radius:12px;padding:2px 10px;font-size:10px;font-weight:700;">SUSPENDED</span>`;
+            if (u.isVerified) return `<span style="background:rgba(0,240,255,0.1);color:var(--neon-cyan);border:1px solid var(--neon-cyan);border-radius:12px;padding:2px 10px;font-size:10px;font-weight:700;">VERIFIED</span>`;
+            return `<span style="background:rgba(255,230,0,0.1);color:#ffe600;border:1px solid #ffe600;border-radius:12px;padding:2px 10px;font-size:10px;font-weight:700;">UNVERIFIED</span>`;
+        };
+
+        const actionBtns = (u) => {
+            if (u.role === 'admin') return `<span style="color:var(--text-dim);font-size:11px;">Protected</span>`;
+            const verifyBtn = !u.isVerified
+                ? `<button class="admin-user-action" data-action="verify" data-id="${u.id}" data-name="${u.username}" style="background:rgba(0,240,255,0.12);color:var(--neon-cyan);border:1px solid var(--neon-cyan-border);padding:4px 10px;border-radius:4px;font-size:10px;cursor:pointer;font-weight:700;" title="Verify Account"><i class="fa-solid fa-circle-check"></i> Verify</button>`
+                : '';
+            const suspendLabel = u.status === 'suspended' ? 'Reactivate' : 'Suspend';
+            const suspendIcon  = u.status === 'suspended' ? 'fa-play' : 'fa-ban';
+            const suspendColor = u.status === 'suspended' ? '#22c55e' : '#f59e0b';
+            const suspendBtn = `<button class="admin-user-action" data-action="suspend" data-id="${u.id}" data-name="${u.username}" style="background:rgba(245,158,11,0.1);color:${suspendColor};border:1px solid ${suspendColor};padding:4px 10px;border-radius:4px;font-size:10px;cursor:pointer;font-weight:700;" title="${suspendLabel} Account"><i class="fa-solid ${suspendIcon}"></i> ${suspendLabel}</button>`;
+            const deleteBtn = `<button class="admin-user-action" data-action="delete" data-id="${u.id}" data-name="${u.username}" style="background:rgba(239,68,68,0.1);color:#ef4444;border:1px solid #ef4444;padding:4px 10px;border-radius:4px;font-size:10px;cursor:pointer;font-weight:700;" title="Delete Account"><i class="fa-solid fa-trash"></i> Delete</button>`;
+            return `<div style="display:flex;gap:5px;flex-wrap:wrap;">${verifyBtn}${suspendBtn}${deleteBtn}</div>`;
+        };
+
+        const rows = users.length ? users.map(u => `
+            <tr style="border-bottom:1px solid rgba(255,255,255,0.04); transition: background 0.15s;" onmouseover="this.style.background='rgba(0,240,255,0.03)'" onmouseout="this.style.background=''">
+                <td style="padding:10px 12px;">
+                    <div style="display:flex;align-items:center;gap:10px;">
+                        <img src="${u.avatar || 'https://api.dicebear.com/7.x/pixel-art/svg?seed=' + u.username}" style="width:32px;height:32px;border-radius:50%;border:1px solid rgba(0,240,255,0.2);" onerror="this.src='https://api.dicebear.com/7.x/pixel-art/svg?seed=player'">
+                        <div>
+                            <div style="font-weight:700;color:#fff;font-size:13px;">${u.username || '—'}</div>
+                            <div style="font-size:10px;color:var(--text-dim);">${u.uid || '—'}</div>
+                        </div>
+                    </div>
+                </td>
+                <td style="padding:10px 12px;font-size:12px;color:#9ca3af;">${u.email || '—'}</td>
+                <td style="padding:10px 12px;">${statusBadge(u)}</td>
+                <td style="padding:10px 12px;font-size:11px;color:var(--text-dim);">${u.created_at ? window.strikzFormatDate(u.created_at) : '—'}</td>
+                <td style="padding:10px 12px;">${actionBtns(u)}</td>
+            </tr>`).join('') : `<tr><td colspan="5" style="padding:40px;text-align:center;color:var(--text-dim);">No player accounts found</td></tr>`;
+
+        const paginationBtns = Array.from({ length: pages }, (_, i) => i + 1).map(p =>
+            `<button class="admin-page-btn" data-page="${p}" style="min-width:32px;padding:4px 10px;border-radius:4px;font-size:12px;cursor:pointer;border:1px solid ${p === page ? 'var(--neon-cyan)' : 'rgba(255,255,255,0.1)'};background:${p === page ? 'rgba(0,240,255,0.1)' : 'transparent'};color:${p === page ? 'var(--neon-cyan)' : '#9ca3af'};">${p}</button>`
+        ).join('');
+
+        mount.innerHTML = `
+            <div style="padding:25px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:20px;">
+                    <div>
+                        <h3 class="font-orbitron" style="margin:0;font-size:16px;color:var(--neon-cyan);">PLAYER ACCOUNTS</h3>
+                        <p style="margin:4px 0 0;font-size:12px;color:var(--text-dim);">${total} total account${total !== 1 ? 's' : ''} in the database</p>
+                    </div>
+                    <div style="display:flex;gap:8px;align-items:center;">
+                        <input id="player-search-input" type="text" placeholder="Search by name, email or UID..." value="${search}" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:#fff;padding:7px 12px;border-radius:4px;font-size:12px;width:230px;">
+                        <button id="player-search-btn" style="background:rgba(0,240,255,0.1);color:var(--neon-cyan);border:1px solid var(--neon-cyan-border);padding:7px 14px;border-radius:4px;font-size:12px;cursor:pointer;font-weight:700;"><i class="fa-solid fa-magnifying-glass"></i> Search</button>
+                    </div>
+                </div>
+
+                <div style="overflow-x:auto;">
+                    <table style="width:100%;border-collapse:collapse;">
+                        <thead>
+                            <tr style="border-bottom:1px solid rgba(0,240,255,0.12);">
+                                <th style="padding:10px 12px;text-align:left;font-size:10px;color:var(--neon-cyan);font-weight:700;letter-spacing:0.1em;text-transform:uppercase;">Player</th>
+                                <th style="padding:10px 12px;text-align:left;font-size:10px;color:var(--neon-cyan);font-weight:700;letter-spacing:0.1em;text-transform:uppercase;">Email</th>
+                                <th style="padding:10px 12px;text-align:left;font-size:10px;color:var(--neon-cyan);font-weight:700;letter-spacing:0.1em;text-transform:uppercase;">Status</th>
+                                <th style="padding:10px 12px;text-align:left;font-size:10px;color:var(--neon-cyan);font-weight:700;letter-spacing:0.1em;text-transform:uppercase;">Joined</th>
+                                <th style="padding:10px 12px;text-align:left;font-size:10px;color:var(--neon-cyan);font-weight:700;letter-spacing:0.1em;text-transform:uppercase;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>${rows}</tbody>
+                    </table>
+                </div>
+
+                ${pages > 1 ? `<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:18px;justify-content:center;">${paginationBtns}</div>` : ''}
+            </div>`;
+
+        // Search button
+        document.getElementById('player-search-btn').onclick = async () => {
+            const q = document.getElementById('player-search-input').value.trim();
+            await renderPlayersTab(mount, 1, q);
+        };
+        document.getElementById('player-search-input').addEventListener('keydown', async (e) => {
+            if (e.key === 'Enter') {
+                const q = e.target.value.trim();
+                await renderPlayersTab(mount, 1, q);
+            }
+        });
+
+        // Pagination buttons
+        mount.querySelectorAll('.admin-page-btn').forEach(btn => {
+            btn.onclick = async () => {
+                await renderPlayersTab(mount, parseInt(btn.dataset.page), search);
+            };
+        });
+
+        // Action buttons (verify / suspend / delete)
+        mount.querySelectorAll('.admin-user-action').forEach(btn => {
+            btn.onclick = async function() {
+                const action  = this.dataset.action;
+                const id      = this.dataset.id;
+                const name    = this.dataset.name;
+
+                if (action === 'delete') {
+                    if (!confirm(`⚠️ Permanently delete account "${name}"?\n\nThis cannot be undone.`)) return;
+                }
+                if (action === 'suspend') {
+                    const label = this.textContent.includes('Suspend') ? 'suspend' : 'reactivate';
+                    if (!confirm(`${label === 'suspend' ? '🚫 Suspend' : '▶ Reactivate'} account "${name}"?`)) return;
+                }
+
+                this.disabled = true;
+                this.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+
+                try {
+                    let res;
+                    if (action === 'verify') {
+                        res = await fetch(`/api/v1/admin/users/${id}/verify`, {
+                            method: 'PUT',
+                            headers: { 'Authorization': `Bearer ${token}` }
+                        });
+                    } else if (action === 'suspend') {
+                        res = await fetch(`/api/v1/admin/users/${id}/suspend`, {
+                            method: 'PUT',
+                            headers: { 'Authorization': `Bearer ${token}` }
+                        });
+                    } else if (action === 'delete') {
+                        res = await fetch(`/api/v1/admin/users/${id}`, {
+                            method: 'DELETE',
+                            headers: { 'Authorization': `Bearer ${token}` }
+                        });
+                    }
+                    const json = await res.json();
+                    if (!res.ok) throw new Error(json.message || 'Action failed');
+                    alert('✅ ' + json.message);
+                    await renderPlayersTab(mount, page, search);
+                } catch (err) {
+                    alert('❌ ' + err.message);
+                    this.disabled = false;
+                }
+            };
+        });
     }
 
     // Attach to global window
