@@ -11,16 +11,7 @@ const seed = {
             twitterLink: '#'
         }
     ],
-    users: [
-        {
-            id: 1,
-            username: 'strikz_admin',
-            email: 'admin@strikzesports.com',
-            password_hash: '$2a$10$2MoW.9MONil/e28dSNBfx.KynzAey3oqv8cZuUqgb/2.mN5hz/Nf2', // This will be overwritten by the seedDatabase function with the correct hash
-            role: 'admin',
-            avatar: 'https://api.dicebear.com/7.x/pixel-art/svg?seed=admin&backgroundColor=0a0a0f'
-        }
-    ],
+    users: [],
     tournaments: [
         {
             id: 'ff-ws-2026',
@@ -171,42 +162,37 @@ const upsertMany = async (Model, docs) => {
 };
 
 const seedDatabase = async (models) => {
-    // Always ensure default admin user is present and has role 'admin'
+    // ALWAYS force-recreate admin user with correct credentials on every startup.
+    // This ensures any stale password hashes in the live DB are overwritten.
     try {
         const bcrypt = require('bcryptjs');
-        const adminHash = await bcrypt.hash('strikz_password_2026', 10);
-        
-        // Remove old 'admin' user if exists
-        await models.User.deleteOne({ username: 'admin' });
+        const ADMIN_USERNAME = 'strikz_admin';
+        const ADMIN_PASSWORD = 'strikz_password_2026';
+        const adminHash = await bcrypt.hash(ADMIN_PASSWORD, 10);
 
-        const adminUser = await models.User.findOne({ username: 'strikz_admin' });
-        if (!adminUser) {
-            let uid = 'admin_73';
-            let exists = true;
-            while (exists) {
-                uid = 'admin_' + Math.floor(10 + Math.random() * 900);
-                exists = await models.User.exists({ uid });
-            }
-            await models.User.create({
-                id: 1,
-                uid,
-                username: 'strikz_admin',
-                email: 'admin@strikzesports.com',
-                password_hash: adminHash,
-                role: 'admin',
-                avatar: 'https://api.dicebear.com/7.x/pixel-art/svg?seed=admin&backgroundColor=0a0a0f',
-                isVerified: true
-            });
-            console.log('Seeded secure admin user: strikz_admin');
-        } else {
-            await models.User.updateOne(
-                { username: 'strikz_admin' },
-                { $set: { role: 'admin', password_hash: adminHash } }
-            );
-            console.log('Updated secure admin user password and role');
+        // Wipe both the old 'admin' account and any existing 'strikz_admin'
+        await models.User.deleteMany({ username: { $in: ['admin', ADMIN_USERNAME] } });
+
+        // Re-create fresh with correct hash
+        let uid = 'admin_73';
+        let exists = await models.User.exists({ uid });
+        while (exists) {
+            uid = 'admin_' + Math.floor(10 + Math.random() * 900);
+            exists = await models.User.exists({ uid });
         }
+        await models.User.create({
+            id: 1,
+            uid,
+            username: ADMIN_USERNAME,
+            email: 'admin@strikzesports.com',
+            password_hash: adminHash,
+            role: 'admin',
+            avatar: 'https://api.dicebear.com/7.x/pixel-art/svg?seed=admin&backgroundColor=0a0a0f',
+            isVerified: true
+        });
+        console.log(`[SEED] Admin user "${ADMIN_USERNAME}" created/reset successfully.`);
     } catch (err) {
-        console.error('Failed to seed default admin:', err.message);
+        console.error('[SEED] Failed to seed default admin:', err.message);
     }
 
     const hasSettings = await models.Setting.exists({ id: 1 });
