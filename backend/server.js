@@ -22,6 +22,9 @@ const PORT = process.env.PORT || 5000;
 const frontendDir = path.join(__dirname, '../frontend');
 const uploadsDir = path.join(__dirname, '../uploads');
 
+// Enable trust proxy for correct client IP detection behind reverse proxies (Render, Cloudflare, etc.)
+app.set('trust proxy', 1);
+
 // ==========================================
 // SECURITY LAYERS & MIDDLEWARES
 // ==========================================
@@ -54,7 +57,7 @@ app.use(express.urlencoded({ extended: true, limit: '5mb' }));
 // 4. Rate Limiting
 const generalLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 200, // Limit each IP to 200 requests per 15 minutes
+    max: 2000, // Limit each IP to 2000 requests per 15 minutes
     message: { success: false, message: 'Too many requests from this terminal IP. Please cooldown and try again later.' }
 });
 app.use('/api', generalLimiter);

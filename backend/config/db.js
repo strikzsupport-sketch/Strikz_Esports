@@ -7,9 +7,10 @@ const modelOptions = {
     timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' }
 };
 
-const createModel = (name, collection, idType = String) => {
+const createModel = (name, collection, idType = String, extraFields = {}) => {
     const schema = new mongoose.Schema({
-        id: { type: idType, unique: true, sparse: true, index: true }
+        id: { type: idType, unique: true, sparse: true, index: true },
+        ...extraFields
     }, modelOptions);
 
     schema.set('toJSON', {
@@ -23,13 +24,25 @@ const createModel = (name, collection, idType = String) => {
 };
 
 const models = {
-    User: createModel('User', 'users', Number),
+    User: createModel('User', 'users', Number, {
+        username: { type: String, unique: true, sparse: true, index: true },
+        email: { type: String, unique: true, sparse: true, index: true },
+        uid: { type: String, unique: true, sparse: true, index: true }
+    }),
     Setting: createModel('Setting', 'settings', Number),
     Tournament: createModel('Tournament', 'tournaments'),
     Registration: createModel('Registration', 'registrations'),
-    RegistrationPlayer: createModel('RegistrationPlayer', 'registration_players', Number),
-    Team: createModel('Team', 'teams'),
-    TeamMember: createModel('TeamMember', 'team_members', Number),
+    RegistrationPlayer: createModel('RegistrationPlayer', 'registration_players', Number, {
+        registration_id: { type: String, index: true },
+        user_uid: { type: String, index: true }
+    }),
+    Team: createModel('Team', 'teams', String, {
+        captain_uid: { type: String, unique: true, sparse: true, index: true }
+    }),
+    TeamMember: createModel('TeamMember', 'team_members', Number, {
+        user_uid: { type: String, index: true },
+        team_id: { type: String, index: true }
+    }),
     News: createModel('News', 'news'),
     Gallery: createModel('Gallery', 'gallery', Number),
     Roster: createModel('Roster', 'roster'),
@@ -39,16 +52,28 @@ const models = {
     SocialFeed: createModel('SocialFeed', 'social_feed'),
     Management: createModel('Management', 'management', Number),
     AuditLog: createModel('AuditLog', 'audit_logs', Number),
-    Notification: createModel('Notification', 'notifications', Number),
+    Notification: createModel('Notification', 'notifications', Number, {
+        user_uid: { type: String, index: true }
+    }),
     UploadedFile: createModel('UploadedFile', 'uploaded_files'),
-    Friendship: createModel('Friendship', 'friendships'),
-    ChatMessage: createModel('ChatMessage', 'chat_messages'),
-    TeamMessage: createModel('TeamMessage', 'team_messages'),
+    Friendship: createModel('Friendship', 'friendships', String, {
+        user_uid_1: { type: String, index: true },
+        user_uid_2: { type: String, index: true }
+    }),
+    ChatMessage: createModel('ChatMessage', 'chat_messages', String, {
+        sender_uid: { type: String, index: true },
+        receiver_uid: { type: String, index: true }
+    }),
+    TeamMessage: createModel('TeamMessage', 'team_messages', String, {
+        team_id: { type: String, index: true }
+    }),
     EmailSetting: createModel('EmailSetting', 'email_settings', Number),
     EmailTemplate: createModel('EmailTemplate', 'email_templates'),
     EmailLog: createModel('EmailLog', 'email_logs'),
     EmailQueue: createModel('EmailQueue', 'email_queue'),
-    OtpCode: createModel('OtpCode', 'otp_codes')
+    OtpCode: createModel('OtpCode', 'otp_codes', String, {
+        email: { type: String, index: true }
+    })
 };
 
 const connectDB = async () => {
