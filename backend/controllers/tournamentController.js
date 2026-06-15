@@ -168,29 +168,75 @@ const createRegistration = async (req, res, next) => {
         }
 
         // Dispatch Registration and Attendance Confirmation Emails
-        const email = baseRegistration.captain_email || baseRegistration.player_email;
-        const name = baseRegistration.captain_name || baseRegistration.player_name;
-        if (email) {
-            const emailService = require('../utils/emailService');
+        const emailService = require('../utils/emailService');
+        if (type === 'Team') {
+            // 1. Send registration and attendance confirmation to captain
+            if (baseRegistration.captain_email) {
+                try {
+                    await emailService.sendRegistrationConfirmation(
+                        baseRegistration.captain_email,
+                        baseRegistration.captain_name,
+                        regId,
+                        tourney.name,
+                        tourney.startDate,
+                        tourney.rules ? 'Server Lobby' : 'Bermuda Arena Office'
+                    );
+                    await emailService.sendAttendanceConfirmation(
+                        baseRegistration.captain_email,
+                        baseRegistration.captain_name,
+                        regId,
+                        tourney.name
+                    );
+                } catch (emailErr) {
+                    console.error('Failed to send registration/attendance email to captain:', emailErr.message);
+                }
+            }
+
+            // 2. Send registration confirmation to all teammates
             try {
-                // Send Registration confirmation email
-                await emailService.sendRegistrationConfirmation(
-                    email, 
-                    name, 
-                    regId, 
-                    tourney.name, 
-                    tourney.startDate, 
-                    tourney.rules ? 'Server Lobby' : 'Bermuda Arena Office'
-                );
-                // Also send attendance confirmation email
-                await emailService.sendAttendanceConfirmation(
-                    email, 
-                    name, 
-                    regId, 
-                    tourney.name
-                );
-            } catch (emailErr) {
-                console.error('Failed to send registration/attendance emails:', emailErr);
+                const regPlayers = await models.RegistrationPlayer.find({ registration_id: regId }).lean();
+                for (const p of regPlayers) {
+                    if (!p.user_uid) continue;
+                    const playerUser = await models.User.findOne({ uid: p.user_uid }).select('email username').lean();
+                    if (playerUser && playerUser.email && playerUser.email !== baseRegistration.captain_email) {
+                        try {
+                            await emailService.sendRegistrationConfirmation(
+                                playerUser.email,
+                                p.name || playerUser.username,
+                                regId,
+                                tourney.name,
+                                tourney.startDate,
+                                tourney.rules ? 'Server Lobby' : 'Bermuda Arena Office'
+                            );
+                        } catch (emailErr) {
+                            console.error(`Failed to send registration email to teammate ${playerUser.email}:`, emailErr.message);
+                        }
+                    }
+                }
+            } catch (pErr) {
+                console.error('Failed to query teammate players for registration emails:', pErr.message);
+            }
+        } else {
+            // Solo registration
+            if (baseRegistration.player_email) {
+                try {
+                    await emailService.sendRegistrationConfirmation(
+                        baseRegistration.player_email,
+                        baseRegistration.player_name,
+                        regId,
+                        tourney.name,
+                        tourney.startDate,
+                        tourney.rules ? 'Server Lobby' : 'Bermuda Arena Office'
+                    );
+                    await emailService.sendAttendanceConfirmation(
+                        baseRegistration.player_email,
+                        baseRegistration.player_name,
+                        regId,
+                        tourney.name
+                    );
+                } catch (emailErr) {
+                    console.error('Failed to send solo registration/attendance emails:', emailErr.message);
+                }
             }
         }
 
@@ -501,6 +547,60 @@ const confirmJoin = async (req, res, next) => {
 
         if (allConfirmed) {
             await models.Registration.updateOne({ id: regId }, { $set: { stage: 2 } });
+        }
+
+        // Notify all team members about the confirmed player
+        try {
+            const registration = await models.Registration.findOne({ id: regId }).lean();
+            if (registration && registration.type === 'Team') {
+                const tourney = await models.Tournament.findOne({ id: registration.tournament_id }).lean();
+                const player = await models.RegistrationPlayer.findOne({ registration_id: regId, user_uid: uid }).lean();
+                const emailService = require('../utils/emailService');
+
+                const recipients = [];
+                // Add captain
+                if (registration.captain_email) {
+                    recipients.push({
+                        email: registration.captain_email,
+                        name: registration.captain_name
+                    });
+                }
+                // Add players
+                const regPlayers = await models.RegistrationPlayer.find({ registration_id: regId }).lean();
+                for (const rp of regPlayers) {
+                    if (!rp.user_uid) continue;
+                    const pUser = await models.User.findOne({ uid: rp.user_uid }).select('email username').lean();
+                    if (pUser && pUser.email && !recipients.some(r => r.email === pUser.email)) {
+                        recipients.push({
+                            email: pUser.email,
+                            name: rp.name || pUser.username
+                        });
+                    }
+                }
+
+                // Send email to everyone in the list
+                for (const r of recipients) {
+                    try {
+                        const content = `
+                            <h3 style="color: #00f0ff; font-size: 18px; margin-top: 0;">SQUAD MEMBER ATTENDANCE LOCKED</h3>
+                            <p>Hello <strong>${r.name}</strong>,</p>
+                            <p>This is to notify you that player <strong>${player ? player.name : uid}</strong> has confirmed their roster participation for tournament <strong>${tourney ? tourney.name : 'Championship'}</strong> in squad <strong>${registration.team_name}</strong>.</p>
+                            <p>Roster status of the squad is being updated. Thank you!</p>
+                        `;
+                        const html = emailService.getHtmlWrapper(content);
+                        await emailService.sendEmailDirect({
+                            to: r.email,
+                            subject: `Member Confirmed: ${registration.team_name}`,
+                            html,
+                            type: 'Member Confirmation'
+                        });
+                    } catch (emailErr) {
+                        console.error(`Failed to send player confirmation email to ${r.email}:`, emailErr.message);
+                    }
+                }
+            }
+        } catch (notifErr) {
+            console.error('Failed to notify team members about confirmation:', notifErr.message);
         }
 
         res.json({ success: true, message: 'Roster join invitation confirmed successfully', allConfirmed });

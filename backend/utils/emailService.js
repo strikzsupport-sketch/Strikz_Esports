@@ -621,5 +621,6 @@ module.exports = {
     sendAttendanceConfirmation,
     sendAttendanceReminder,
     sendTournamentUpdate,
-    sendResultsNotification
+    sendResultsNotification,
+    getHtmlWrapper
 };
