@@ -158,6 +158,7 @@
                         initSpotlightEffect();
                         updateDynamicLinks();
                         window.scrollTo({ top: 0, behavior: 'instant' });
+                        adjustMobileLayout();
                     } catch (err) {
                         console.error("Renderer Error:", err);
                         appContent.innerHTML = `
@@ -191,6 +192,7 @@
                     initScrollAnimations();
                     initSpotlightEffect();
                     window.scrollTo({ top: 0, behavior: 'instant' });
+                    adjustMobileLayout();
                 } catch (err) {
                     console.error("Renderer Error Fallback:", err);
                 }
@@ -636,6 +638,7 @@
                 });
             });
         }
+        adjustMobileLayout();
     }
 
     function updateDynamicLinks() {
@@ -903,6 +906,32 @@
     }
     window.updateInboxBadges = updateInboxBadges;
 
+    function adjustMobileLayout() {
+        const mobileHeader = document.querySelector('.mobile-header');
+        const quickPortal = document.getElementById('quick-portal-bar');
+        const mainContent = document.getElementById('app-content');
+        if (mobileHeader && window.innerWidth <= 768) {
+            const headerHeight = mobileHeader.offsetHeight;
+            if (quickPortal && !quickPortal.classList.contains('hidden')) {
+                quickPortal.style.setProperty('top', `${headerHeight}px`, 'important');
+                if (mainContent) {
+                    mainContent.style.setProperty('margin-top', `${headerHeight + 40}px`, 'important');
+                }
+            } else {
+                if (quickPortal) quickPortal.style.removeProperty('top');
+                if (mainContent) {
+                    mainContent.style.setProperty('margin-top', `${headerHeight}px`, 'important');
+                }
+            }
+        } else {
+            if (quickPortal) quickPortal.style.removeProperty('top');
+            if (mainContent) {
+                mainContent.style.removeProperty('margin-top');
+            }
+        }
+    }
+    window.adjustMobileLayout = adjustMobileLayout;
+
     function openLoginModal() {
         if (!loginModal) return;
         loginModal.classList.add('active');
@@ -1004,6 +1033,8 @@
 
     // Initial Bindings
     window.addEventListener('hashchange', router);
+    window.addEventListener('resize', adjustMobileLayout);
+    window.addEventListener('orientationchange', adjustMobileLayout);
     window.addEventListener('DOMContentLoaded', () => {
         prefetchGoogleConfig();
 

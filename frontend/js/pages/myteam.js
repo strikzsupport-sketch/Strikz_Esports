@@ -504,7 +504,7 @@
                     <!-- Left Column: Friends List & Requests -->
                     <div style="display:flex; flex-direction:column; gap:20px;">
                         <!-- Send Request Form -->
-                        <div class="glass-panel" style="padding:15px; border-color:var(--glass-border);">
+                        <div class="glass-panel" style="padding:15px; border-color:var(--glass-border); overflow:visible !important;">
                             <h4 class="font-orbitron" style="font-size: 11px; color: var(--neon-cyan); margin-bottom:12px; border-bottom:1px solid var(--glass-border); padding-bottom:4px;">ADD FREQUENCY (FRIEND)</h4>
                             <div style="position:relative; display:flex; gap:6px;">
                                 <input type="text" id="friend-search-input" placeholder="Enter gamer uid" style="flex-grow:1; background:rgba(0,0,0,0.3); border:1px solid var(--glass-border); padding:8px 12px; color:#fff; border-radius:4px; font-size:12px; text-transform: lowercase;">
