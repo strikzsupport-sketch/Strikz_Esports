@@ -23,7 +23,7 @@ const SPONSOR_FIELDS = ['name', 'logo', 'tier', 'website', 'description'];
 const WINNER_FIELDS = ['teamName', 'event', 'date', 'prize', 'tier', 'image', 'placement', 'title', 'reward', 'details'];
 const SOCIAL_FIELDS = ['platform', 'author', 'authorAvatar', 'content', 'date', 'link', 'mediaUrl'];
 const MANAGEMENT_FIELDS = ['name', 'role', 'image', 'bio', 'instagram', 'youtube'];
-const SETTINGS_FIELDS = ['discordLink', 'instagramLink', 'youtubeLink', 'twitterLink', 'announcementBanner', 'announcementActive', 'maintenanceMode', 'contactEmail', 'partnerEmail', 'showKd', 'showHs', 'showMatches', 'showWinRate', 'showRank'];
+const SETTINGS_FIELDS = ['discordLink', 'instagramLink', 'youtubeLink', 'twitterLink', 'announcementBanner', 'announcementActive', 'maintenanceMode', 'contactEmail', 'partnerEmail', 'showKd', 'showHs', 'showMatches', 'showWinRate', 'showRank', 'supportEmail', 'address'];
 
 // ==========================================
 // AUDIT LOGGING
@@ -597,6 +597,12 @@ const deleteManagement = async (req, res, next) => {
 const updateSettings = async (req, res, next) => {
     try {
         const data = pick(req.body, SETTINGS_FIELDS);
+        if (data.supportEmail && !data.contactEmail) {
+            data.contactEmail = data.supportEmail;
+        }
+        if (data.contactEmail && !data.supportEmail) {
+            data.supportEmail = data.contactEmail;
+        }
         await models.Setting.updateOne({ id: 1 }, { $set: data }, { upsert: true });
         await logAdminAction(req, 'UPDATE_SETTINGS', { fields: Object.keys(data) });
         res.json({ success: true, message: 'Global website configurations updated' });

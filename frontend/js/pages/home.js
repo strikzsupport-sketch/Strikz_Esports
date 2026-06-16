@@ -144,10 +144,10 @@
                                         ${item.redirectLink ? `
                                             <a href="${item.redirectLink}" target="_blank" class="cta-button btn-neon-orange" style="padding: 6px 14px; font-family: var(--font-header); font-size: 10px; font-weight: 800; border-radius: 4px; color:#000 !important;">
                                                 <i class="${item.contentType === 'Video' ? 'fa-solid fa-play' : 'fa-solid fa-arrow-up-right-from-square'}"></i> 
-                                                ${item.contentType === 'Video' ? 'WATCH NOW' : (item.contentType === 'Post' ? 'VIEW POST' : 'WATCH LIVE')}
+                                                CLICK HERE
                                             </a>
                                         ` : `
-                                            <a href="#/news" class="btn-neon-cyan" style="padding: 6px 14px; font-family: var(--font-header); font-size: 10px; font-weight: 800; border-radius: 4px;">READ ARTICLE</a>
+                                            <a href="#/news" class="btn-neon-cyan" style="padding: 6px 14px; font-family: var(--font-header); font-size: 10px; font-weight: 800; border-radius: 4px;">CLICK HERE</a>
                                         `}
                                     </div>
                                 </div>

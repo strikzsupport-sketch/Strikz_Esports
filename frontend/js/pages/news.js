@@ -90,13 +90,11 @@
             }
 
             grid.innerHTML = filtered.map(item => {
-                let btnText = 'READ ARTICLE';
+                let btnText = 'CLICK HERE';
                 let btnClass = 'btn-neon-cyan';
                 if (item.contentType === 'Video') {
-                    btnText = 'WATCH VIDEO';
                     btnClass = 'btn-neon-orange';
                 } else if (item.contentType === 'Post') {
-                    btnText = 'VIEW POST';
                     btnClass = 'btn-neon-orange';
                 }
 
