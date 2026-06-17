@@ -470,10 +470,10 @@ const confirmAttendance = async (req, res, next) => {
             </head>
             <body>
                 <div class="container">
-                    <img src="https://strikz-esports.onrender.com/assets/logo.png" alt="Strikz Logo" style="width: 80px; height: 80px; margin-bottom: 20px;">
+                    <img src="https://www.strikzesports.in/assets/logo.png" alt="Strikz Logo" style="width: 80px; height: 80px; margin-bottom: 20px;">
                     <h1>${status === 'Confirmed' ? 'ATTENDANCE LOCKED' : 'REGISTRATION DECLINED'}</h1>
                     <p>${responseMessage}</p>
-                    <a href="https://strikz-esports.onrender.com/#/" class="btn">RETURN TO MAIN TERMINAL</a>
+                    <a href="https://www.strikzesports.in/#/" class="btn">RETURN TO MAIN TERMINAL</a>
                 </div>
             </body>
             </html>

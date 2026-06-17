@@ -256,7 +256,7 @@ const getHtmlWrapper = (content) => {
                     <!-- Header -->
                     <tr>
                         <td align="center" style="padding: 30px 20px 20px 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
-                            <img src="https://strikz-esports.onrender.com/assets/logo.png" alt="Strikz Logo" style="width: 70px; height: 70px; display: block; margin-bottom: 10px;">
+                            <img src="https://www.strikzesports.in/assets/logo.png" alt="Strikz Logo" style="width: 70px; height: 70px; display: block; margin-bottom: 10px;">
                             <h2 style="margin: 0; color: #ff5e00; font-size: 24px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase;">STRIKZ ESPORTS</h2>
                             <p style="margin: 5px 0 0 0; color: #00f0ff; font-size: 11px; font-weight: 700; letter-spacing: 0.2em;">THE ULTIMATE FREE FIRE MAX ARENA</p>
                         </td>
@@ -322,7 +322,7 @@ const sendRegistrationConfirmation = async (email, playerName, regId, tournament
         <div style="background: rgba(255, 230, 0, 0.05); border: 1.5px solid #ffe600; padding: 15px; border-radius: 4px; margin: 20px 0; text-align: center; box-shadow: 0 0 10px rgba(255, 230, 0, 0.15);">
             <p style="margin: 0; color: #ffe600; font-weight: 800; font-size: 14px; text-transform: uppercase; letter-spacing: 0.05em;">ACTION REQUIRED: CONFIRM ROSTER PARTICIPATION</p>
             <p style="margin: 6px 0 0 0; font-size: 13px; color: #d1d5db; line-height: 1.4;">You have been drafted into team roster for this championship. Please log in to Strikz Esports and confirm your roster participation in the My Team HQ inbox.</p>
-            <a href="https://strikz-esports.onrender.com/#/my-team" style="background: #ffe600; color: #000000; text-decoration: none; padding: 10px 20px; border-radius: 4px; font-weight: 800; display: inline-block; margin-top: 12px; font-size: 12px; letter-spacing: 0.05em; text-transform: uppercase;">
+            <a href="https://www.strikzesports.in/#/my-team" style="background: #ffe600; color: #000000; text-decoration: none; padding: 10px 20px; border-radius: 4px; font-weight: 800; display: inline-block; margin-top: 12px; font-size: 12px; letter-spacing: 0.05em; text-transform: uppercase;">
                 GO TO MY TEAM HQ
             </a>
         </div>
@@ -400,7 +400,7 @@ const sendTournamentInvitation = async (email, username, tournament) => {
         <p>Do you have what it takes to assert dominance and claim your share of the bounty? Lock in your team roster before the gate closes.</p>
         
         <div style="text-align: center; margin: 30px 0;">
-            <a href="https://strikz-esports.onrender.com/#/registration" style="background: #ff5e00; color: #ffffff; text-decoration: none; padding: 12px 30px; border-radius: 4px; font-weight: bold; letter-spacing: 0.05em; display: inline-block; box-shadow: 0 0 15px rgba(255,94,0,0.3);">
+            <a href="https://www.strikzesports.in/#/registration" style="background: #ff5e00; color: #ffffff; text-decoration: none; padding: 12px 30px; border-radius: 4px; font-weight: bold; letter-spacing: 0.05em; display: inline-block; box-shadow: 0 0 15px rgba(255,94,0,0.3);">
                 REGISTER Roster NOW
             </a>
         </div>
@@ -445,7 +445,7 @@ const sendRegistrationReminder = async (email, username, tournament, daysLeft) =
         </table>
 
         <div style="text-align: center; margin: 25px 0;">
-            <a href="https://strikz-esports.onrender.com/#/registration" style="background: #ffe600; color: #000000; text-decoration: none; padding: 12px 30px; border-radius: 4px; font-weight: 800; letter-spacing: 0.05em; display: inline-block;">
+            <a href="https://www.strikzesports.in/#/registration" style="background: #ffe600; color: #000000; text-decoration: none; padding: 12px 30px; border-radius: 4px; font-weight: 800; letter-spacing: 0.05em; display: inline-block;">
                 LOCK IN REGISTRATION
             </a>
         </div>
@@ -469,8 +469,8 @@ const sendRegistrationReminder = async (email, username, tournament, daysLeft) =
 // 5. Send Participation Attendance Confirmation Link
 const sendAttendanceConfirmation = async (email, playerName, regId, tournamentName) => {
     const isAuto = await isAutomaticEnabled('attendanceConfirm');
-    const confirmUrl = `https://strikz-esports.onrender.com/api/v1/my-team/confirm-attendance?regId=${encodeURIComponent(regId)}&status=Confirmed`;
-    const declineUrl = `https://strikz-esports.onrender.com/api/v1/my-team/confirm-attendance?regId=${encodeURIComponent(regId)}&status=Declined`;
+    const confirmUrl = `https://www.strikzesports.in/api/v1/my-team/confirm-attendance?regId=${encodeURIComponent(regId)}&status=Confirmed`;
+    const declineUrl = `https://www.strikzesports.in/api/v1/my-team/confirm-attendance?regId=${encodeURIComponent(regId)}&status=Declined`;
     
     const content = `
         <h3 style="color: #00f0ff; font-size: 18px; margin-top: 0;">SQUAD ATTENDANCE LOCK REQUIRED</h3>
@@ -507,7 +507,7 @@ const sendAttendanceConfirmation = async (email, playerName, regId, tournamentNa
 // 6. Send Attendance Reminder Email
 const sendAttendanceReminder = async (email, playerName, regId, tournamentName, hoursLeft) => {
     const isAuto = await isAutomaticEnabled('reminders');
-    const confirmUrl = `https://strikz-esports.onrender.com/api/v1/my-team/confirm-attendance?regId=${encodeURIComponent(regId)}&status=Confirmed`;
+    const confirmUrl = `https://www.strikzesports.in/api/v1/my-team/confirm-attendance?regId=${encodeURIComponent(regId)}&status=Confirmed`;
     
     const content = `
         <h3 style="color: #ff5e00; font-size: 18px; margin-top: 0;">FINAL NOTICE: ATTENDANCE SLOT WARNING</h3>
