@@ -118,7 +118,7 @@
                     <div class="glass-panel" style="text-align: center; border-color: var(--neon-cyan-border); box-shadow: 0 0 15px rgba(0, 240, 255, 0.05);">
                         <img src="assets/logo.png" alt="Strikz Shield" style="max-height: 180px; margin: 0 auto 20px auto;">
                         <h4 class="font-orbitron" style="font-size: 18px; margin-bottom: 6px;">STRIKZ ESPORTS ARENA</h4>
-                        <p style="font-size: 12px; color: var(--neon-cyan); letter-spacing: 0.1em; text-transform: uppercase;">Est. ${settings.establishedYear || '2022'} • ${settings.arenaLocation || 'Bermuda Arena'}</p>
+                        <p style="font-size: 12px; color: var(--neon-cyan); letter-spacing: 0.1em; text-transform: uppercase;">Est. ${settings.establishedYear || '2022'} • ${settings.arenaLocation || 'BHUBANESWAR, ODISHA'}</p>
                         <div style="border-top: 1px solid var(--glass-border); margin-top: 20px; padding-top: 15px;">
                              <span class="font-orbitron" style="font-size: 32px; font-weight: 900; color: var(--neon-orange);">#1</span>
                             <p style="font-size: 11px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.05em;">Ranked Free Fire Guild (Qualifiers)</p>
