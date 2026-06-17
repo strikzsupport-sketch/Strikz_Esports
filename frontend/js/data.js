@@ -309,6 +309,24 @@
             return res.success;
         },
 
+        addHistory: async function(item) {
+            const res = await apiRequest('/admin/history', 'POST', item);
+            this.fetchSnapshot();
+            return res.success;
+        },
+
+        updateHistory: async function(item) {
+            const res = await apiRequest(`/admin/history/${item.id}`, 'PUT', item);
+            this.fetchSnapshot();
+            return res.success;
+        },
+
+        deleteHistory: async function(id) {
+            const res = await apiRequest(`/admin/history/${id}`, 'DELETE');
+            this.fetchSnapshot();
+            return res.success;
+        },
+
         addSponsor: async function(item) {
             const res = await apiRequest('/admin/sponsors', 'POST', item);
             this.fetchSnapshot();

@@ -174,9 +174,10 @@
                         <button class="admin-tab-btn" data-tab="team_members"><i class="fa-solid fa-users-viewfinder"></i> Team Members</button>
                         <button class="admin-tab-btn" data-tab="sponsors"><i class="fa-solid fa-handshake"></i> Sponsors</button>
                         <button class="admin-tab-btn" data-tab="winners"><i class="fa-solid fa-trophy"></i> Winners</button>
-                        <button class="admin-tab-btn" data-tab="social"><i class="fa-solid fa-share-nodes"></i> Social Feed</button>
+                        <button class="admin-tab-btn" data-tab="social"><i class="fa-solid fa-share-nodes"></i> Recent Post</button>
                         <button class="admin-tab-btn" data-tab="management"><i class="fa-solid fa-users-gear"></i> Management</button>
                         <button class="admin-tab-btn" data-tab="settings"><i class="fa-solid fa-gears"></i> Website Settings</button>
+                        <button class="admin-tab-btn" data-tab="history"><i class="fa-solid fa-clock-rotate-left"></i> History Timeline</button>
                         <button class="admin-tab-btn" data-tab="chatbot"><i class="fa-solid fa-comments"></i> Chatbot Inbox</button>
                         <button class="admin-tab-btn" data-tab="email"><i class="fa-solid fa-envelope"></i> Email Center</button>
                         <button class="admin-tab-btn" data-tab="players" style="border-top: 1px solid rgba(0,240,255,0.15); margin-top: 6px; padding-top: 10px; color: var(--neon-cyan);"><i class="fa-solid fa-users-gear"></i> Players</button>
@@ -264,6 +265,10 @@
                 else if (tab === 'settings') {
                     db = await window.strikzDb.fetchSnapshot();
                     renderSettingsTab(panelContent, db);
+                }
+                else if (tab === 'history') {
+                    db = await window.strikzDb.fetchSnapshot();
+                    renderHistoryTab(panelContent, db);
                 }
                 else if (tab === 'chatbot') {
                     const tickets = await window.strikzDb.getTickets();
@@ -1101,19 +1106,7 @@
                             <label for="social-content">Post Content</label>
                             <textarea id="social-content" rows="3" placeholder="Social post text details..." required style="width: 100%; background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); padding: 8px; border-radius: 4px; color: #fff; font-size: 13px;"></textarea>
                         </div>
-                        <div class="form-group">
-                            <label for="social-image">Post Image / Upload (Optional)</label>
-                            <div style="display: flex; gap: 8px; align-items: center;">
-                                <input type="text" id="social-image" placeholder="Image URL path or upload..." style="color: #fff; flex: 1;">
-                                <div style="position: relative; overflow: hidden; display: inline-block;">
-                                    <button type="button" class="admin-action-btn green" style="margin: 0; padding: 10px 14px; height: 100%; white-space: nowrap;"><i class="fa-solid fa-upload"></i> UPLOAD</button>
-                                    <input type="file" id="social-image-file" accept="image/*" style="position: absolute; font-size: 100px; opacity: 0; right: 0; top: 0; cursor: pointer;">
-                                </div>
-                            </div>
-                            <div id="social-image-preview" style="margin-top: 8px; display: none;">
-                                <img src="" style="max-height: 80px; border-radius: 4px; border: 1px solid var(--glass-border);">
-                            </div>
-                        </div>
+                        <input type="hidden" id="social-image" value="">
                         <button type="submit" class="cta-button btn-neon-cyan w-full" id="btn-save-social">
                             <span class="btn-text">SAVE POST</span>
                         </button>
@@ -1143,9 +1136,10 @@
         const imageInput = document.getElementById('social-image');
         const imageFileInput = document.getElementById('social-image-file');
         const imagePreviewContainer = document.getElementById('social-image-preview');
-        const imagePreviewImg = imagePreviewContainer.querySelector('img');
+        const imagePreviewImg = imagePreviewContainer ? imagePreviewContainer.querySelector('img') : null;
 
         function updateSocialPreview(src) {
+            if (!imagePreviewContainer || !imagePreviewImg) return;
             if (src) {
                 imagePreviewImg.src = src;
                 imagePreviewContainer.style.display = 'block';
@@ -1154,21 +1148,25 @@
             }
         }
 
-        imageInput.addEventListener('input', () => updateSocialPreview(imageInput.value.trim()));
+        if (imageInput) {
+            imageInput.addEventListener('input', () => updateSocialPreview(imageInput.value.trim()));
+        }
 
-        imageFileInput.addEventListener('change', async function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                try {
-                    const res = await window.strikzDb.uploadFile(file);
-                    imageInput.value = res.imageUrl;
-                    updateSocialPreview(res.imageUrl);
-                    alert("Image uploaded successfully!");
-                } catch (err) {
-                    alert("Upload failed: " + err.message);
+        if (imageFileInput) {
+            imageFileInput.addEventListener('change', async function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    try {
+                        const res = await window.strikzDb.uploadFile(file);
+                        imageInput.value = res.imageUrl;
+                        updateSocialPreview(res.imageUrl);
+                        alert("Image uploaded successfully!");
+                    } catch (err) {
+                        alert("Upload failed: " + err.message);
+                    }
                 }
-            }
-        });
+            });
+        }
 
         function loadSocialList() {
             const list = db.socialFeed || [];
@@ -1265,29 +1263,29 @@
     // 6. WINNERS CRUD PANEL
     function renderWinnersTab(mount, db) {
         mount.innerHTML = `
-            <h3 class="font-orbitron" style="font-size: 18px; color: var(--neon-cyan); margin-bottom: 25px;"><i class="fa-solid fa-trophy"></i> CHAMPIONSHIP WINNERS HALL EDIT</h3>
+            <h3 class="font-orbitron" style="font-size: 18px; color: var(--neon-cyan); margin-bottom: 25px;"><i class="fa-solid fa-trophy"></i> TOURNAMENT STANDINGS & WINNERS</h3>
             
             <div class="grid-2" style="align-items: start;">
                 <!-- Winner Form -->
                 <div class="glass-panel" style="padding: 20px; border-color: rgba(255,255,255,0.03);">
-                    <h4 class="font-orbitron" style="font-size: 13px; color: var(--neon-orange); margin-bottom: 15px;"><i class="fa-solid fa-circle-plus"></i> ADD CHAMPIONSHIP WIN</h4>
+                    <h4 class="font-orbitron" style="font-size: 13px; color: var(--neon-orange); margin-bottom: 15px;"><i class="fa-solid fa-circle-plus"></i> NEW ANNOUNCEMENT / STANDINGS</h4>
                     
                     <form id="admin-winner-form" onsubmit="return false;">
                         <input type="hidden" id="edit-winner-id">
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="winner-team">Winner Team Name</label>
+                                <label for="winner-team">Spotlight Winner Team Name</label>
                                 <input type="text" id="winner-team" value="STRIKZ ESPORTS" required style="color: #fff;">
                             </div>
                             <div class="form-group">
-                                <label for="winner-title">Title / Placement</label>
+                                <label for="winner-title">Championship Title</label>
                                 <input type="text" id="winner-title" placeholder="E.g. Champions" required style="color: #fff;">
                             </div>
                         </div>
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="winner-event">Event Name</label>
-                                <input type="text" id="winner-event" placeholder="E.g. FFIC India Finals 2025" required style="color: #fff;">
+                                <label for="winner-event">Event / Tournament Name</label>
+                                <input type="text" id="winner-event" placeholder="E.g. Free Fire Standings Cup" required style="color: #fff;">
                             </div>
                             <div class="form-group">
                                 <label for="winner-date">Secured Date</label>
@@ -1301,7 +1299,7 @@
                             </div>
                             <div class="form-group">
                                 <label for="winner-tier">Trophy Tier</label>
-                                <select id="winner-tier" required style="background:#101010; border:1px solid var(--glass-border); padding:10px; color:#fff; border-radius:4px;">
+                                <select id="winner-tier" required style="background:#101010; border:1px solid var(--glass-border); padding:10px; color:#fff; border-radius:4px; height: 42px; width: 100%;">
                                     <option value="gold">Gold Tier (1st)</option>
                                     <option value="silver">Silver Tier (2nd)</option>
                                     <option value="bronze">Bronze Tier (3rd)</option>
@@ -1325,7 +1323,13 @@
                             <label for="winner-details">Championship Highlights / Roster</label>
                             <textarea id="winner-details" rows="3" placeholder="Roster details and tactical highlights..." required style="width: 100%; background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); padding: 8px; border-radius: 4px; color: #fff; font-size: 13px;"></textarea>
                         </div>
-                        <button type="submit" class="cta-button btn-neon-cyan w-full" id="btn-save-winner">
+                        
+                        <h5 class="font-orbitron" style="font-size: 11px; color: var(--neon-yellow); margin-top: 25px; margin-bottom: 12px; border-bottom: 1px solid var(--glass-border); padding-bottom: 4px;">RANKED STANDINGS (UP TO 10 WINNERS)</h5>
+                        <div id="winners-rank-inputs" style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 15px; max-height: 350px; overflow-y: auto; padding-right: 5px;">
+                            <!-- Rendered dynamically -->
+                        </div>
+
+                        <button type="submit" class="cta-button btn-neon-cyan w-full" id="btn-save-winner" style="margin-top: 15px;">
                             <span class="btn-text">SAVE WINNER RECORD</span>
                         </button>
                     </form>
@@ -1333,7 +1337,7 @@
 
                 <!-- Existing Winners List -->
                 <div style="display: flex; flex-direction: column; gap: 15px;">
-                    <h4 class="font-orbitron" style="font-size: 13px; color: var(--text-silver); margin-bottom: 5px;">TROPHY CABINET CABINET</h4>
+                    <h4 class="font-orbitron" style="font-size: 13px; color: var(--text-silver); margin-bottom: 5px;">CHAMPIONSHIP STANDINGS</h4>
                     <div id="admin-winners-list" style="display: flex; flex-direction: column; gap: 10px; max-height: 400px; overflow-y: auto;">
                         <!-- Injected dynamically -->
                     </div>
@@ -1383,11 +1387,74 @@
             }
         });
 
+        function loadRankInputs(winnersList = []) {
+            const container = document.getElementById('winners-rank-inputs');
+            let ranksHtml = '';
+            for (let r = 1; r <= 10; r++) {
+                const w = winnersList.find(x => x.rank === r) || {};
+                ranksHtml += `
+                    <div class="glass-panel rank-row-group" data-rank="${r}" style="padding: 12px; background: rgba(0,0,0,0.2); border-color: rgba(255,255,255,0.02);">
+                        <div style="font-size: 11px; color: var(--neon-cyan); font-weight: 800; font-family: var(--font-header); margin-bottom: 8px;">POSITION / RANK #${r} ${r === 1 ? '(Featured Spotlight)' : ''}</div>
+                        <div style="display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 8px; margin-bottom: 8px;">
+                            <div class="form-group" style="margin-bottom:0;">
+                                <label style="font-size:9px; margin-bottom:2px; display:block;">Team Name</label>
+                                <input type="text" class="rank-team-name" value="${w.teamName || ''}" placeholder="${r === 1 ? 'E.g. STRIKZ ESPORTS' : 'Leave empty to skip...'}" style="color: #fff; padding: 6px; font-size:11px;">
+                            </div>
+                            <div class="form-group" style="margin-bottom:0;">
+                                <label style="font-size:9px; margin-bottom:2px; display:block;">Trophy Tier</label>
+                                <select class="rank-tier" style="background:#101010; border:1px solid var(--glass-border); padding:6px; color:#fff; border-radius:4px; font-size:11px; height: 32px; width:100%;">
+                                    <option value="" ${!w.tier ? 'selected' : ''}>No Tier</option>
+                                    <option value="diamond" ${w.tier === 'diamond' ? 'selected' : ''}>Diamond</option>
+                                    <option value="platinum" ${w.tier === 'platinum' ? 'selected' : ''}>Platinum</option>
+                                    <option value="gold" ${w.tier === 'gold' ? 'selected' : ''}>Gold</option>
+                                    <option value="silver" ${w.tier === 'silver' ? 'selected' : ''}>Silver</option>
+                                    <option value="bronze" ${w.tier === 'bronze' ? 'selected' : ''}>Bronze</option>
+                                </select>
+                            </div>
+                            <div class="form-group" style="margin-bottom:0;">
+                                <label style="font-size:9px; margin-bottom:2px; display:block;">Prize / Reward</label>
+                                <input type="text" class="rank-prize" value="${w.prize || ''}" placeholder="E.g. $500" style="color: #fff; padding: 6px; font-size:11px;">
+                            </div>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label style="font-size:9px; margin-bottom:2px; display:block;">Team Logo / Crest URL</label>
+                            <div style="display: flex; gap: 6px; align-items: center;">
+                                <input type="text" class="rank-logo" value="${w.teamLogo || ''}" placeholder="URL or upload logo..." style="color: #fff; padding: 6px; flex: 1; font-size:11px;">
+                                <div style="position: relative; overflow: hidden; display: inline-block;">
+                                    <button type="button" class="admin-action-btn green btn-rank-upload" style="margin: 0; padding: 6px 10px; height: 32px; font-size:10px; white-space: nowrap;"><i class="fa-solid fa-upload"></i></button>
+                                    <input type="file" class="rank-logo-file" accept="image/*" style="position: absolute; font-size: 100px; opacity: 0; right: 0; top: 0; cursor: pointer;">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            container.innerHTML = ranksHtml;
+
+            // Bind file uploads
+            container.querySelectorAll('.rank-logo-file').forEach(input => {
+                input.onchange = async function(e) {
+                    const file = e.target.files[0];
+                    if (!file) return;
+                    try {
+                        const res = await window.strikzDb.uploadFile(file);
+                        const row = input.closest('.rank-row-group');
+                        row.querySelector('.rank-logo').value = res.imageUrl;
+                        alert(`Logo for Rank #${row.dataset.rank} uploaded successfully!`);
+                    } catch (err) {
+                        alert("Upload failed: " + err.message);
+                    }
+                };
+            });
+        }
+
+        loadRankInputs([]);
+
         function loadWinnersList() {
             const list = db.achievements || [];
             listMount.innerHTML = list.map(w => `
                 <div class="glass-panel" style="padding: 15px; display: flex; justify-content: space-between; align-items: center;">
-                    <div>
+                    <div style="text-align: left;">
                         <span class="font-orbitron" style="font-size: 9px; color: var(--neon-cyan);">${w.title}</span>
                         <h5 class="font-orbitron" style="font-size: 13px; color: #fff; margin: 4px 0 2px 0;">${w.event}</h5>
                         <p style="font-size: 11px; color: var(--text-dim);">Team: <strong>${w.teamName}</strong> | Reward: <strong style="color:var(--neon-green);">${w.reward}</strong></p>
@@ -1432,6 +1499,7 @@
                         updateWinnerPreview(w.image);
                         detailsInput.value = w.details || '';
                         
+                        loadRankInputs(w.winnersList || []);
                         saveBtn.querySelector('.btn-text').textContent = 'UPDATE WINNER RECORD';
                     }
                 };
@@ -1441,25 +1509,51 @@
         form.onsubmit = async function(e) {
             if (e) e.preventDefault();
             const id = editIdInput.value;
+            
+            // Build the standings list
+            const winnersList = [];
+            document.querySelectorAll('.rank-row-group').forEach(row => {
+                const r = Number(row.dataset.rank);
+                const teamName = row.querySelector('.rank-team-name').value.trim();
+                const tier = row.querySelector('.rank-tier').value;
+                const prize = row.querySelector('.rank-prize').value.trim();
+                const logo = row.querySelector('.rank-logo').value.trim();
+                
+                if (teamName) {
+                    winnersList.push({
+                        rank: r,
+                        teamName,
+                        tier,
+                        prize,
+                        teamLogo: logo
+                    });
+                }
+            });
+
+            // Make sure rank 1 team name matches main team name if not specified
+            const r1 = winnersList.find(x => x.rank === 1);
+            const mainTeam = teamInput.value.trim() || (r1 ? r1.teamName : 'STRIKZ ESPORTS');
+
             const winObj = {
-                teamName: teamInput.value.trim(),
+                teamName: mainTeam,
                 title: titleInput.value.trim(),
                 event: eventInput.value.trim(),
                 date: dateInput.value.trim(),
                 reward: rewardInput.value.trim(),
                 tier: tierSelect.value,
                 image: imageInput.value.trim(),
-                details: detailsInput.value.trim()
+                details: detailsInput.value.trim(),
+                winnersList
             };
 
             try {
                 if (id) {
-                    winObj.id = id;
+                    winObj.id = Number(id);
                     await window.strikzDb.updateWinner(winObj);
-                    alert("Winner record updated successfully!");
+                    alert("Winners standings updated successfully!");
                 } else {
                     await window.strikzDb.addWinner(winObj);
-                    alert("New winner record added to cabinet successfully!");
+                    alert("New standings announcement created successfully!");
                 }
 
                 form.reset();
@@ -1467,12 +1561,13 @@
                 teamInput.value = 'STRIKZ ESPORTS';
                 imageInput.value = 'assets/tournament_banner.png';
                 updateWinnerPreview('');
+                loadRankInputs([]);
                 saveBtn.querySelector('.btn-text').textContent = 'SAVE WINNER RECORD';
                 
                 db = await window.strikzDb.fetchSnapshot();
                 loadWinnersList();
             } catch (err) {
-                alert("Error saving winner record: " + err.message);
+                alert("Error saving winners record: " + err.message);
             }
         };
 
@@ -1626,6 +1721,9 @@
                                 <label for="sponsor-logo-upload">Sponsor Logo Image (Optional)</label>
                                 <input type="file" id="sponsor-logo-upload" accept="image/*" style="background: rgba(255,255,255,0.02); border: 1px solid var(--glass-border); padding: 8px; border-radius: 4px; color:#fff; font-size: 11px; width: 100%;">
                                 <input type="hidden" id="sponsor-logo-base64">
+                                <div id="sponsor-logo-preview" style="margin-top: 8px; display: none;">
+                                    <img src="" style="max-height: 50px; border: 1px solid var(--glass-border); border-radius: 4px; object-fit: contain; background: rgba(255,255,255,0.05); padding: 4px;">
+                                </div>
                             </div>
                         </div>
                         <div class="form-row">
@@ -1670,6 +1768,18 @@
         const logoBase64Input = document.getElementById('sponsor-logo-base64');
         const saveBtn = document.getElementById('btn-save-sponsor');
 
+        const logoPreviewContainer = document.getElementById('sponsor-logo-preview');
+        const logoPreviewImg = logoPreviewContainer.querySelector('img');
+
+        function updateSponsorLogoPreview(src) {
+            if (src) {
+                logoPreviewImg.src = src;
+                logoPreviewContainer.style.display = 'block';
+            } else {
+                logoPreviewContainer.style.display = 'none';
+            }
+        }
+
         // Bind logo file loader
         if (logoFileInput) {
             logoFileInput.onchange = async function() {
@@ -1678,6 +1788,7 @@
                 try {
                     const res = await window.strikzDb.uploadFile(file);
                     logoBase64Input.value = res.imageUrl;
+                    updateSponsorLogoPreview(res.imageUrl);
                     alert("Image uploaded successfully!");
                 } catch (err) {
                     alert("Upload failed: " + err.message);
@@ -1689,12 +1800,15 @@
             const list = db.sponsors || [];
             listMount.innerHTML = list.map(s => `
                 <div class="glass-panel" style="padding: 15px; display: flex; justify-content: space-between; align-items: center;">
-                    <div style="text-align: left;">
-                        <span class="font-orbitron" style="font-size: 9px; color: var(--neon-yellow);">${s.tier.toUpperCase()} TIER</span>
-                        <h5 class="font-orbitron" style="font-size: 13px; color: #fff; margin: 2px 0;">${s.name}</h5>
-                        <p style="font-size: 11px; color: var(--text-dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 200px; margin: 0;">
-                            Type: <strong>${s.promoType}</strong> | Link: <a href="${s.link}" target="_blank" style="color: var(--neon-orange);">${s.link}</a>
-                        </p>
+                    <div style="text-align: left; display: flex; align-items: center; gap: 15px;">
+                        ${s.logo ? `<img src="${s.logo}" style="max-height: 40px; max-width: 60px; object-fit: contain; border-radius: 4px; background: rgba(255,255,255,0.05); padding: 2px;">` : `<div style="border: 1px dashed var(--glass-border); padding: 5px 10px; font-size: 10px; font-weight:700;">No Image</div>`}
+                        <div>
+                            <span class="font-orbitron" style="font-size: 9px; color: var(--neon-yellow);">${s.tier.toUpperCase()} TIER</span>
+                            <h5 class="font-orbitron" style="font-size: 13px; color: #fff; margin: 2px 0;">${s.name}</h5>
+                            <p style="font-size: 11px; color: var(--text-dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 200px; margin: 0;">
+                                Type: <strong>${s.promoType}</strong> | Link: <a href="${s.link}" target="_blank" style="color: var(--neon-orange);">${s.link}</a>
+                            </p>
+                        </div>
                     </div>
                     <div style="display: flex; gap: 6px;">
                         <button class="action-icon-btn approve edit-sponsor-btn" data-id="${s.id}" title="Edit"><i class="fa-solid fa-pen-to-square"></i></button>
@@ -1730,6 +1844,7 @@
                         promoTypeSelect.value = s.promoType || 'Website';
                         linkInput.value = s.link;
                         logoBase64Input.value = s.logo || '';
+                        updateSponsorLogoPreview(s.logo || '');
                         saveBtn.querySelector('.btn-text').textContent = 'UPDATE SPONSOR';
                     }
                 };
@@ -1761,6 +1876,7 @@
                 form.reset();
                 editIdInput.value = '';
                 logoBase64Input.value = '';
+                updateSponsorLogoPreview('');
                 saveBtn.querySelector('.btn-text').textContent = 'SAVE SPONSOR';
                 db = await window.strikzDb.fetchSnapshot();
                 loadSponsorsList();
@@ -2361,6 +2477,132 @@
         loadRosterList();
     }
 
+    // 11b. HISTORY / TIMELINE MILESTONES TAB
+    function renderHistoryTab(mount, db) {
+        mount.innerHTML = `
+            <h3 class="font-orbitron" style="font-size: 18px; color: var(--neon-cyan); margin-bottom: 25px;"><i class="fa-solid fa-clock-rotate-left"></i> HISTORY TIMELINE EDIT</h3>
+            
+            <div class="grid-2" style="align-items: start;">
+                <!-- History Milestone Form -->
+                <div class="glass-panel" style="padding: 20px; border-color: rgba(255,255,255,0.03);">
+                    <h4 class="font-orbitron" style="font-size: 13px; color: var(--neon-orange); margin-bottom: 15px;"><i class="fa-solid fa-circle-plus"></i> ADD / EDIT MILESTONE</h4>
+                    
+                    <form id="admin-history-form" onsubmit="return false;">
+                        <input type="hidden" id="edit-history-id">
+                        <div class="form-group">
+                            <label for="history-year">Milestone Year / Date</label>
+                            <input type="text" id="history-year" placeholder="E.g. JUNE 2022 or 2025" required style="color: #fff;">
+                        </div>
+                        <div class="form-group">
+                            <label for="history-title">Milestone Title</label>
+                            <input type="text" id="history-title" placeholder="E.g. The Birth of STRIKZ ESPORTS" required style="color: #fff;">
+                        </div>
+                        <div class="form-group">
+                            <label for="history-desc">Milestone Description</label>
+                            <textarea id="history-desc" rows="3" placeholder="Describe the milestone..." required style="width: 100%; background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); padding: 8px; border-radius: 4px; color: #fff; font-size: 13px;"></textarea>
+                        </div>
+                        <button type="submit" class="cta-button btn-neon-cyan w-full" id="btn-save-history" style="margin-top: 15px;">
+                            <span class="btn-text">SAVE MILESTONE</span>
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Existing Milestones List -->
+                <div style="display: flex; flex-direction: column; gap: 15px;">
+                    <h4 class="font-orbitron" style="font-size: 13px; color: var(--text-silver); margin-bottom: 5px;">CURRENT MILESTONES</h4>
+                    <div id="admin-history-list" style="display: flex; flex-direction: column; gap: 10px; max-height: 450px; overflow-y: auto;">
+                        <!-- Injected dynamically -->
+                    </div>
+                </div>
+            </div>
+        `;
+
+        const form = document.getElementById('admin-history-form');
+        const listMount = document.getElementById('admin-history-list');
+        const editIdInput = document.getElementById('edit-history-id');
+        const yearInput = document.getElementById('history-year');
+        const titleInput = document.getElementById('history-title');
+        const descInput = document.getElementById('history-desc');
+        const saveBtn = document.getElementById('btn-save-history');
+
+        function loadHistoryList() {
+            const list = db.history || [];
+            listMount.innerHTML = list.map(h => `
+                <div class="glass-panel" style="padding: 15px; display: flex; justify-content: space-between; align-items: center;">
+                    <div style="text-align: left;">
+                        <span class="font-orbitron" style="font-size: 10px; color: var(--neon-cyan); font-weight: 800;">${h.year}</span>
+                        <h5 class="font-orbitron" style="font-size: 12px; color: #fff; margin: 2px 0;">${h.title}</h5>
+                        <p style="font-size: 11px; color: var(--text-dim); max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin: 0;">${h.description}</p>
+                    </div>
+                    <div style="display: flex; gap: 6px;">
+                        <button class="action-icon-btn approve edit-history-btn" data-id="${h.id}" title="Edit"><i class="fa-solid fa-pen-to-square"></i></button>
+                        <button class="action-icon-btn delete delete-history-btn" data-id="${h.id}" title="Delete"><i class="fa-solid fa-trash-can"></i></button>
+                    </div>
+                </div>
+            `).join('');
+
+            listMount.querySelectorAll('.delete-history-btn').forEach(btn => {
+                btn.onclick = async function() {
+                    if (confirm("Delete this history milestone permanently?")) {
+                        const id = this.dataset.id;
+                        try {
+                            await window.strikzDb.deleteHistory(id);
+                            db = await window.strikzDb.fetchSnapshot();
+                            loadHistoryList();
+                        } catch (err) {
+                            alert("Delete failed: " + err.message);
+                        }
+                    }
+                };
+            });
+
+            listMount.querySelectorAll('.edit-history-btn').forEach(btn => {
+                btn.onclick = function() {
+                    const id = this.dataset.id;
+                    const h = db.history.find(x => x.id === Number(id));
+                    if (h) {
+                        editIdInput.value = h.id;
+                        yearInput.value = h.year;
+                        titleInput.value = h.title;
+                        descInput.value = h.description;
+                        saveBtn.querySelector('.btn-text').textContent = 'UPDATE MILESTONE';
+                    }
+                };
+            });
+        }
+
+        form.onsubmit = async function(e) {
+            if (e) e.preventDefault();
+            const id = editIdInput.value;
+            const historyObj = {
+                year: yearInput.value.trim(),
+                title: titleInput.value.trim(),
+                description: descInput.value.trim()
+            };
+
+            try {
+                if (id) {
+                    historyObj.id = Number(id);
+                    await window.strikzDb.updateHistory(historyObj);
+                    alert("Milestone updated successfully!");
+                } else {
+                    await window.strikzDb.addHistory(historyObj);
+                    alert("Milestone added successfully!");
+                }
+
+                form.reset();
+                editIdInput.value = '';
+                saveBtn.querySelector('.btn-text').textContent = 'SAVE MILESTONE';
+                db = await window.strikzDb.fetchSnapshot();
+                loadHistoryList();
+            } catch (err) {
+                alert("Error saving milestone: " + err.message);
+            }
+        };
+
+        loadHistoryList();
+    }
+
     // 12. WEBSITE SETTINGS PANEL
     function renderSettingsTab(mount, db) {
         const settings = window.strikzDb.getSettings();
@@ -2414,6 +2656,22 @@
                         <input type="text" id="set-address" value="${settings.address || ''}" required style="color: #fff;">
                     </div>
 
+                    <h5 class="font-orbitron" style="font-size: 11px; color: var(--neon-yellow); margin-top: 25px; margin-bottom: 12px; border-bottom: 1px solid var(--glass-border); padding-bottom: 4px;">ARENA META INFORMATION</h5>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="set-est-year">Established Year</label>
+                            <input type="text" id="set-est-year" value="${settings.establishedYear || '2022'}" required style="color: #fff;">
+                        </div>
+                        <div class="form-group">
+                            <label for="set-arena-location">Arena Location</label>
+                            <input type="text" id="set-arena-location" value="${settings.arenaLocation || 'Bermuda Arena'}" required style="color: #fff;">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="set-history-heading">Journey / History Section Heading</label>
+                        <input type="text" id="set-history-heading" value="${settings.historyHeading || 'OUR JOURNEY TO GLORY'}" required style="color: #fff;">
+                    </div>
+
                     <h5 class="font-orbitron" style="font-size: 11px; color: var(--neon-yellow); margin-top: 25px; margin-bottom: 12px; border-bottom: 1px solid var(--glass-border); padding-bottom: 4px;">ROSTER STATISTICS VISIBILITY</h5>
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 15px; margin-bottom: 20px;">
                         <label style="display: flex; align-items: center; gap: 8px; font-size: 12px; cursor: pointer; color: var(--text-silver);">
@@ -2452,6 +2710,9 @@
                 supportEmail: document.getElementById('set-support-email').value.trim(),
                 partnerEmail: document.getElementById('set-partner-email').value.trim(),
                 address: document.getElementById('set-address').value.trim(),
+                establishedYear: document.getElementById('set-est-year').value.trim(),
+                arenaLocation: document.getElementById('set-arena-location').value.trim(),
+                historyHeading: document.getElementById('set-history-heading').value.trim(),
                 showKd: document.getElementById('set-show-kd').checked,
                 showHs: document.getElementById('set-show-hs').checked,
                 showMatches: document.getElementById('set-show-matches').checked,
@@ -3153,12 +3414,13 @@
             const verifyBtn = !u.isVerified
                 ? `<button class="admin-user-action" data-action="verify" data-id="${u.id}" data-name="${u.username}" style="background:rgba(0,240,255,0.12);color:var(--neon-cyan);border:1px solid var(--neon-cyan-border);padding:4px 10px;border-radius:4px;font-size:10px;cursor:pointer;font-weight:700;" title="Verify Account"><i class="fa-solid fa-circle-check"></i> Verify</button>`
                 : '';
+            const promoteBtn = `<button class="admin-user-action" data-action="promote" data-id="${u.id}" data-name="${u.username}" style="background:rgba(168,85,247,0.15);color:#c084fc;border:1px solid #a855f7;padding:4px 10px;border-radius:4px;font-size:10px;cursor:pointer;font-weight:700;" title="Promote to Admin"><i class="fa-solid fa-user-shield"></i> Promote</button>`;
             const suspendLabel = u.status === 'suspended' ? 'Reactivate' : 'Suspend';
             const suspendIcon  = u.status === 'suspended' ? 'fa-play' : 'fa-ban';
             const suspendColor = u.status === 'suspended' ? '#22c55e' : '#f59e0b';
             const suspendBtn = `<button class="admin-user-action" data-action="suspend" data-id="${u.id}" data-name="${u.username}" style="background:rgba(245,158,11,0.1);color:${suspendColor};border:1px solid ${suspendColor};padding:4px 10px;border-radius:4px;font-size:10px;cursor:pointer;font-weight:700;" title="${suspendLabel} Account"><i class="fa-solid ${suspendIcon}"></i> ${suspendLabel}</button>`;
             const deleteBtn = `<button class="admin-user-action" data-action="delete" data-id="${u.id}" data-name="${u.username}" style="background:rgba(239,68,68,0.1);color:#ef4444;border:1px solid #ef4444;padding:4px 10px;border-radius:4px;font-size:10px;cursor:pointer;font-weight:700;" title="Delete Account"><i class="fa-solid fa-trash"></i> Delete</button>`;
-            return `<div style="display:flex;gap:5px;flex-wrap:wrap;">${verifyBtn}${suspendBtn}${deleteBtn}</div>`;
+            return `<div style="display:flex;gap:5px;flex-wrap:wrap;">${verifyBtn}${promoteBtn}${suspendBtn}${deleteBtn}</div>`;
         };
 
         const rows = users.length ? users.map(u => `
@@ -3246,6 +3508,9 @@
                     const label = this.textContent.includes('Suspend') ? 'suspend' : 'reactivate';
                     if (!confirm(`${label === 'suspend' ? '🚫 Suspend' : '▶ Reactivate'} account "${name}"?`)) return;
                 }
+                if (action === 'promote') {
+                    if (!confirm(`👑 Promote account "${name}" to Admin?\n\nThis will grant full admin privileges to this user.`)) return;
+                }
 
                 this.disabled = true;
                 this.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
@@ -3259,6 +3524,11 @@
                         });
                     } else if (action === 'suspend') {
                         res = await fetch(`/api/v1/admin/users/${id}/suspend`, {
+                            method: 'PUT',
+                            headers: { 'Authorization': `Bearer ${token}` }
+                        });
+                    } else if (action === 'promote') {
+                        res = await fetch(`/api/v1/admin/users/${id}/promote`, {
                             method: 'PUT',
                             headers: { 'Authorization': `Bearer ${token}` }
                         });

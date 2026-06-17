@@ -7,7 +7,7 @@ const publicDoc = (doc) => clean(doc);
 
 const getPublicSnapshot = async (req, res, next) => {
     try {
-        const [tournaments, sponsors, gallery, news, roster, achievements, management, socialFeed, settings] = await Promise.all([
+        const [tournaments, sponsors, gallery, news, roster, achievements, management, socialFeed, settings, history] = await Promise.all([
             models.Tournament.find().sort({ startDate: 1 }).lean(),
             models.Sponsor.find().sort({ tier: -1, name: 1 }).lean(),
             models.Gallery.find().sort({ id: -1 }).lean(),
@@ -16,7 +16,8 @@ const getPublicSnapshot = async (req, res, next) => {
             models.Achievement.find().sort({ id: -1 }).lean(),
             models.Management.find().sort({ id: 1 }).lean(),
             models.SocialFeed.find().sort({ id: -1 }).lean(),
-            models.Setting.findOne({ id: 1 }).lean()
+            models.Setting.findOne({ id: 1 }).lean(),
+            models.History.find().sort({ id: 1 }).lean()
         ]);
 
         res.json({
@@ -64,8 +65,16 @@ const getPublicSnapshot = async (req, res, next) => {
                     return doc;
                 }),
                 management: management.map(publicDoc),
-                socialFeed: socialFeed.map(publicDoc),
-                settings: publicDoc(settings) || {}
+                socialFeed: socialFeed.map(sf => {
+                    const doc = publicDoc(sf);
+                    doc.image = doc.image || doc.mediaUrl || '';
+                    doc.mediaUrl = doc.image;
+                    doc.url = doc.url || doc.link || '';
+                    doc.link = doc.url;
+                    return doc;
+                }),
+                settings: publicDoc(settings) || {},
+                history: history.map(publicDoc)
             }
         });
     } catch (err) {

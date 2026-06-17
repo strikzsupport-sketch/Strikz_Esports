@@ -19,11 +19,12 @@ const TOURNAMENT_FIELDS = ['name', 'game', 'mode', 'category', 'prizePool', 'sta
 const NEWS_FIELDS = ['title', 'tag', 'summary', 'content', 'image', 'contentType', 'redirectLink'];
 const GALLERY_FIELDS = ['title', 'url', 'type'];
 const ROSTER_FIELDS = ['tag', 'fullName', 'role', 'team', 'avatar', 'image', 'bio', 'stats', 'socials', 'kd', 'hs', 'matches', 'winRate', 'twitter', 'youtube', 'instagram', 'rank'];
-const SPONSOR_FIELDS = ['name', 'logo', 'tier', 'website', 'description'];
-const WINNER_FIELDS = ['teamName', 'event', 'date', 'prize', 'tier', 'image', 'placement', 'title', 'reward', 'details'];
+const SPONSOR_FIELDS = ['name', 'logo', 'tier', 'website', 'description', 'logoText', 'promoType', 'link'];
+const WINNER_FIELDS = ['teamName', 'event', 'date', 'prize', 'tier', 'image', 'placement', 'title', 'reward', 'details', 'winnersList'];
 const SOCIAL_FIELDS = ['platform', 'author', 'authorAvatar', 'content', 'date', 'link', 'mediaUrl'];
-const MANAGEMENT_FIELDS = ['name', 'role', 'image', 'bio', 'instagram', 'youtube'];
-const SETTINGS_FIELDS = ['discordLink', 'instagramLink', 'youtubeLink', 'twitterLink', 'announcementBanner', 'announcementActive', 'maintenanceMode', 'contactEmail', 'partnerEmail', 'showKd', 'showHs', 'showMatches', 'showWinRate', 'showRank', 'supportEmail', 'address'];
+const MANAGEMENT_FIELDS = ['name', 'tag', 'role', 'image', 'avatar', 'bio', 'instagram', 'youtube', 'socials'];
+const SETTINGS_FIELDS = ['discordLink', 'instagramLink', 'youtubeLink', 'twitterLink', 'announcementBanner', 'announcementActive', 'maintenanceMode', 'contactEmail', 'partnerEmail', 'showKd', 'showHs', 'showMatches', 'showWinRate', 'showRank', 'supportEmail', 'address', 'establishedYear', 'arenaLocation', 'historyHeading'];
+const HISTORY_FIELDS = ['year', 'title', 'description'];
 
 // ==========================================
 // AUDIT LOGGING
@@ -518,7 +519,10 @@ const deleteWinner = async (req, res, next) => {
 
 const createSocial = async (req, res, next) => {
     try {
-        const data = pick(req.body, SOCIAL_FIELDS);
+        const body = { ...req.body };
+        if (body.url && !body.link) body.link = body.url;
+        if (body.image && !body.mediaUrl) body.mediaUrl = body.image;
+        const data = pick(body, SOCIAL_FIELDS);
         const id = 'social-' + Date.now();
         await models.SocialFeed.create({ id, ...data, date: data.date || 'Just now', likes: Math.floor(Math.random() * 200) + 10 });
         await logAdminAction(req, 'CREATE_SOCIAL', { id, platform: data.platform, author: data.author });
@@ -528,7 +532,10 @@ const createSocial = async (req, res, next) => {
 
 const updateSocial = async (req, res, next) => {
     try {
-        const data = pick(req.body, SOCIAL_FIELDS);
+        const body = { ...req.body };
+        if (body.url && !body.link) body.link = body.url;
+        if (body.image && !body.mediaUrl) body.mediaUrl = body.image;
+        const data = pick(body, SOCIAL_FIELDS);
         const result = await models.SocialFeed.updateOne({ id: req.params.id }, { $set: data });
         if (result.matchedCount === 0) {
             res.status(404);
@@ -829,6 +836,67 @@ const deleteCollectionDoc = async (req, res, next) => {
     } catch (err) { next(err); }
 };
 
+// ==========================================
+// HISTORY (TIMELINE JOURNEY) CRUD
+// ==========================================
+
+const createHistory = async (req, res, next) => {
+    try {
+        const data = pick(req.body, HISTORY_FIELDS);
+        const id = Date.now();
+        await models.History.create({ id, ...data });
+        await logAdminAction(req, 'CREATE_HISTORY', { id, title: data.title });
+        res.status(201).json({ success: true, message: 'History milestone added' });
+    } catch (err) { next(err); }
+};
+
+const updateHistory = async (req, res, next) => {
+    try {
+        const data = pick(req.body, HISTORY_FIELDS);
+        const result = await updateById(models.History, req.params.id, data);
+        if (result.matchedCount === 0) {
+            res.status(404);
+            return next(new Error('History milestone not found'));
+        }
+        await logAdminAction(req, 'UPDATE_HISTORY', { id: req.params.id, title: data.title });
+        res.json({ success: true, message: 'History milestone updated' });
+    } catch (err) { next(err); }
+};
+
+const deleteHistory = async (req, res, next) => {
+    try {
+        const result = await deleteById(models.History, req.params.id);
+        if (result.deletedCount === 0) {
+            res.status(404);
+            return next(new Error('History milestone not found'));
+        }
+        await logAdminAction(req, 'DELETE_HISTORY', { id: req.params.id });
+        res.json({ success: true, message: 'History milestone removed' });
+    } catch (err) { next(err); }
+};
+
+// ==========================================
+// PROMOTE PLAYER TO ADMIN
+// ==========================================
+
+const promoteUser = async (req, res, next) => {
+    try {
+        const userId = Number(req.params.id);
+        const user = await models.User.findOne({ id: userId });
+        if (!user) {
+            res.status(404);
+            return next(new Error('User not found'));
+        }
+        if (user.role === 'admin') {
+            res.status(400);
+            return next(new Error('User is already an admin'));
+        }
+        await models.User.updateOne({ id: userId }, { $set: { role: 'admin' } });
+        await logAdminAction(req, 'PROMOTE_USER', { userId, username: user.username });
+        res.json({ success: true, message: `Account "${user.username}" successfully promoted to Admin.` });
+    } catch (err) { next(err); }
+};
+
 module.exports = {
     getStats,
     getRegistrations,
@@ -867,5 +935,9 @@ module.exports = {
     getCollections,
     getCollectionDocs,
     updateCollectionDoc,
-    deleteCollectionDoc
+    deleteCollectionDoc,
+    createHistory,
+    updateHistory,
+    deleteHistory,
+    promoteUser
 };

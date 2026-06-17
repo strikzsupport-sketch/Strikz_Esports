@@ -41,7 +41,11 @@ const {
     getCollections,
     getCollectionDocs,
     updateCollectionDoc,
-    deleteCollectionDoc
+    deleteCollectionDoc,
+    createHistory,
+    updateHistory,
+    deleteHistory,
+    promoteUser
 } = require('../controllers/adminController');
 
 const {
@@ -110,6 +114,11 @@ router.post('/management', createManagement);
 router.put('/management/:id', updateManagement);
 router.delete('/management/:id', deleteManagement);
 
+// History CRUD
+router.post('/history', createHistory);
+router.put('/history/:id', updateHistory);
+router.delete('/history/:id', deleteHistory);
+
 // Global settings
 router.put('/settings', updateSettings);
 
@@ -121,6 +130,7 @@ router.put('/tickets/:id/resolve', resolveTicket);
 router.get('/users', getAllUsers);
 router.put('/users/:id/verify', verifyUser);
 router.put('/users/:id/suspend', suspendUser);
+router.put('/users/:id/promote', promoteUser);
 router.delete('/users/:id', deleteUser);
 
 // Database Explorer routes

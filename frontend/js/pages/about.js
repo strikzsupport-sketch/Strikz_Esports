@@ -4,6 +4,39 @@
 
 (function() {
     function renderAbout(container) {
+        const db = window.strikzDb.get() || {};
+        const settings = db.settings || {};
+        const history = db.history || [];
+
+        const timelineItemsHTML = history.length ? history.map(item => `
+            <div class="timeline-item">
+                <span class="timeline-year">${item.year}</span>
+                <h4 class="timeline-title">${item.title}</h4>
+                <p class="timeline-desc">${item.description}</p>
+            </div>
+        `).join('') : `
+            <div class="timeline-item">
+                <span class="timeline-year">JUNE 2022</span>
+                <h4 class="timeline-title">The Birth of STRIKZ ESPORTS</h4>
+                <p class="timeline-desc">STRIKZ ESPORTS was founded with a vision to discover hidden talent and create opportunities for underdog players to compete, grow, and succeed in esports.</p>
+            </div>
+            <div class="timeline-item">
+                <span class="timeline-year">2023</span>
+                <h4 class="timeline-title">Building a Strong Community</h4>
+                <p class="timeline-desc">Expanded our network by organizing competitive tournaments and creating a platform where passionate gamers could connect, showcase their skills, and pursue their esports ambitions.</p>
+            </div>
+            <div class="timeline-item">
+                <span class="timeline-year">2024</span>
+                <h4 class="timeline-title">Recognition Across Odisha</h4>
+                <p class="timeline-desc">Through consistent event management and community engagement, STRIKZ ESPORTS became a trusted name among players, teams, and content creators across Odisha.</p>
+            </div>
+            <div class="timeline-item">
+                <span class="timeline-year">2025</span>
+                <h4 class="timeline-title">Empowering the Next Generation</h4>
+                <p class="timeline-desc">With free tournaments, competitive events, and a growing esports ecosystem, STRIKZ ESPORTS continues its mission to help aspiring players turn their passion into achievement.</p>
+            </div>
+        `;
+
         container.innerHTML = `
             <section class="container reveal" style="padding-top: 40px; margin-bottom: 80px;">
                 <div class="section-header">
@@ -33,9 +66,9 @@
                     <div class="glass-panel" style="text-align: center; border-color: var(--neon-cyan-border); box-shadow: 0 0 15px rgba(0, 240, 255, 0.05);">
                         <img src="assets/logo.png" alt="Strikz Shield" style="max-height: 180px; margin: 0 auto 20px auto;">
                         <h4 class="font-orbitron" style="font-size: 18px; margin-bottom: 6px;">STRIKZ ESPORTS ARENA</h4>
-                        <p style="font-size: 12px; color: var(--neon-cyan); letter-spacing: 0.1em; text-transform: uppercase;">Est. 2024 • Bermuda Arena</p>
+                        <p style="font-size: 12px; color: var(--neon-cyan); letter-spacing: 0.1em; text-transform: uppercase;">Est. ${settings.establishedYear || '2022'} • ${settings.arenaLocation || 'Bermuda Arena'}</p>
                         <div style="border-top: 1px solid var(--glass-border); margin-top: 20px; padding-top: 15px;">
-                            <span class="font-orbitron" style="font-size: 32px; font-weight: 900; color: var(--neon-orange);">#1</span>
+                             <span class="font-orbitron" style="font-size: 32px; font-weight: 900; color: var(--neon-orange);">#1</span>
                             <p style="font-size: 11px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.05em;">Ranked Free Fire Guild (Qualifiers)</p>
                         </div>
                     </div>
@@ -43,31 +76,12 @@
  
                 <!-- Organization Timeline -->
                 <div class="reveal" style="margin-top: 80px;">
-                    <h3 class="font-orbitron" style="font-size: 20px; text-align: center; margin-bottom: 30px;">OUR JOURNEY TO GLORY</h3>
+                    <h3 class="font-orbitron" style="font-size: 20px; text-align: center; margin-bottom: 30px;">${settings.historyHeading || 'OUR JOURNEY TO GLORY'}</h3>
                     <div class="about-timeline reveal-stagger">
-                        <div class="timeline-item">
-                            <span class="timeline-year">JUNE 2022</span>
-                            <h4 class="timeline-title">The Birth of STRIKZ ESPORTS</h4>
-                            <p class="timeline-desc">STRIKZ ESPORTS was founded with a vision to discover hidden talent and create opportunities for underdog players to compete, grow, and succeed in esports.</p>
-                        </div>
-                        <div class="timeline-item">
-                            <span class="timeline-year">2023</span>
-                            <h4 class="timeline-title">Building a Strong Community</h4>
-                            <p class="timeline-desc">Expanded our network by organizing competitive tournaments and creating a platform where passionate gamers could connect, showcase their skills, and pursue their esports ambitions.</p>
-                        </div>
-                        <div class="timeline-item">
-                            <span class="timeline-year">2024</span>
-                            <h4 class="timeline-title">Recognition Across Odisha</h4>
-                            <p class="timeline-desc">Through consistent event management and community engagement, STRIKZ ESPORTS became a trusted name among players, teams, and content creators across Odisha.</p>
-                        </div>
-                        <div class="timeline-item">
-                            <span class="timeline-year">2025</span>
-                            <h4 class="timeline-title">Empowering the Next Generation</h4>
-                            <p class="timeline-desc">With free tournaments, competitive events, and a growing esports ecosystem, STRIKZ ESPORTS continues its mission to help aspiring players turn their passion into achievement.</p>
-                        </div>
+                        ${timelineItemsHTML}
                     </div>
                 </div>
-            </section>
+            </section>n>
         `;
     }
 

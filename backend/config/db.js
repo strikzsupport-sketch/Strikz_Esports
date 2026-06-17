@@ -53,7 +53,10 @@ const models = {
         showHs: { type: Boolean, default: true },
         showMatches: { type: Boolean, default: true },
         showWinRate: { type: Boolean, default: true },
-        showRank: { type: Boolean, default: true }
+        showRank: { type: Boolean, default: true },
+        establishedYear: { type: String, default: '2022' },
+        arenaLocation: { type: String, default: 'Bermuda Arena' },
+        historyHeading: { type: String, default: 'OUR JOURNEY TO GLORY' }
     }),
     Tournament: createModel('Tournament', 'tournaments', String, {
         name: { type: String },
@@ -159,7 +162,10 @@ const models = {
         logo: { type: String },
         tier: { type: String },
         website: { type: String },
-        description: { type: String }
+        description: { type: String },
+        logoText: { type: String },
+        promoType: { type: String },
+        link: { type: String }
     }),
     Achievement: createModel('Achievement', 'achievements', Number, {
         teamName: { type: String },
@@ -171,7 +177,16 @@ const models = {
         placement: { type: String },
         title: { type: String },
         reward: { type: String },
-        details: { type: String }
+        details: { type: String },
+        winnersList: [
+            {
+                rank: { type: Number },
+                teamName: { type: String },
+                teamLogo: { type: String },
+                tier: { type: String },
+                prize: { type: String }
+            }
+        ]
     }),
     ChatbotTicket: createModel('ChatbotTicket', 'chatbot_tickets', String, {
         status: { type: String, default: 'Pending' },
@@ -192,11 +207,17 @@ const models = {
     }),
     Management: createModel('Management', 'management', Number, {
         name: { type: String },
+        tag: { type: String },
         role: { type: String },
         image: { type: String },
+        avatar: { type: String },
         bio: { type: String },
         instagram: { type: String },
-        youtube: { type: String }
+        youtube: { type: String },
+        socials: {
+            instagram: { type: String },
+            youtube: { type: String }
+        }
     }),
     AuditLog: createModel('AuditLog', 'audit_logs', Number, {
         admin_id: { type: Number },
@@ -265,6 +286,11 @@ const models = {
         email: { type: String, index: true },
         code_hash: { type: String }, // Stored as SHA-256 hash, never plaintext
         expires_at: { type: Date, index: true } // TTL index will clean these up automatically
+    }),
+    History: createModel('History', 'history', Number, {
+        year: { type: String },
+        title: { type: String },
+        description: { type: String }
     })
 };
 

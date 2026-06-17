@@ -8,7 +8,10 @@ const seed = {
             address: 'Bermuda Arena Office, Digital Esports Valley, IN',
             instagramLink: 'https://instagram.com/strikzesports.in',
             youtubeLink: 'https://youtube.com/strikz-esports',
-            twitterLink: '#'
+            twitterLink: '#',
+            establishedYear: '2022',
+            arenaLocation: 'Bermuda Arena',
+            historyHeading: 'OUR JOURNEY TO GLORY'
         }
     ],
     users: [
@@ -183,6 +186,12 @@ const seed = {
         { id: 1, name: 'Satyajit Mohanty', tag: 'Viper', role: 'Founder & CEO', avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=viperceo&backgroundColor=0a0a0f', bio: 'Esports visionary spearheading competitive tournaments in the region.', instagram: 'https://instagram.com/strikzesports.in', youtube: '#', socials: { instagram: 'https://instagram.com/strikzesports.in', youtube: '#' } },
         { id: 2, name: 'Biswajit Panda', tag: 'Storm', role: 'Co-Founder & COO', avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=stormcoo&backgroundColor=0a0a0f', bio: 'Operations strategist leading tournament management and sponsorship relations.', instagram: '#', youtube: '#', socials: { instagram: '#', youtube: '#' } },
         { id: 3, name: 'Priyabrata Patra', tag: 'Deadeye', role: 'Head of Operations', avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=deadeyeops&backgroundColor=0a0a0f', bio: 'Technical controller handling bracket logic and server security portals.', instagram: '#', youtube: '#', socials: { instagram: '#', youtube: '#' } }
+    ],
+    history: [
+        { id: 1, year: 'JUNE 2022', title: 'The Birth of STRIKZ ESPORTS', description: 'STRIKZ ESPORTS was founded with a vision to discover hidden talent and create opportunities for underdog players to compete, grow, and succeed in esports.' },
+        { id: 2, year: '2023', title: 'Building a Strong Community', description: 'Expanded our network by organizing competitive tournaments and creating a platform where passionate gamers could connect, showcase their skills, and pursue their esports ambitions.' },
+        { id: 3, year: '2024', title: 'Recognition Across Odisha', description: 'Through consistent event management and community engagement, STRIKZ ESPORTS became a trusted name among players, teams, and content creators across Odisha.' },
+        { id: 4, year: '2025', title: 'Empowering the Next Generation', description: 'With free tournaments, competitive events, and a growing esports ecosystem, STRIKZ ESPORTS continues its mission to help aspiring players turn their passion into achievement.' }
     ]
 };
 
@@ -260,6 +269,7 @@ const seedDatabase = async (models) => {
     await upsertMany(models.ChatbotTicket, seed.chatbotTickets);
     await upsertMany(models.SocialFeed, seed.socialFeed);
     await upsertMany(models.Management, seed.management);
+    await upsertMany(models.History, seed.history);
     console.log('MongoDB seed data inserted');
 };
 

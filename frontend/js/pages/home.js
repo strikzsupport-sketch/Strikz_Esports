@@ -183,8 +183,13 @@
                 </div>
                 
                 <div class="grid-3 reveal-stagger">
-                    ${socials.map(post => `
-                        <div class="social-card ${post.platform.toLowerCase()}-card">
+                    ${socials.map(post => {
+                        const targetUrl = post.link || post.url || '#';
+                        const isClickable = targetUrl && targetUrl !== '#';
+                        const clickAttr = isClickable ? `onclick="window.open('${targetUrl}', '_blank')"` : '';
+                        const styleAttr = isClickable ? 'style="cursor: pointer;"' : '';
+                        return `
+                        <div class="social-card ${post.platform.toLowerCase()}-card" ${clickAttr} ${styleAttr}>
                             <div class="social-card-header">
                                 <span class="social-author">${post.author}</span>
                                 <span class="social-platform-badge ${post.platform.toLowerCase()}-badge">
@@ -193,9 +198,9 @@
                             </div>
                             <div class="social-body">
                                 ${post.content}
-                                ${post.image ? `
+                                ${(post.image || post.mediaUrl) ? `
                                 <div class="social-post-img-wrap" style="margin-top: 12px; border-radius: 6px; overflow: hidden; border: 1px solid rgba(255,255,255,0.08);">
-                                    <img src="${post.image}" alt="Community Post Image" style="width: 100%; height: auto; display: block; object-fit: cover; max-height: 200px;">
+                                    <img src="${post.image || post.mediaUrl}" alt="Community Post Image" style="width: 100%; height: auto; display: block; object-fit: cover; max-height: 200px;">
                                 </div>
                                 ` : ''}
                             </div>
@@ -204,7 +209,7 @@
                                 <span>${window.strikzFormatDate(post.date)}</span>
                             </div>
                         </div>
-                    `).join('')}
+                    `}).join('')}
                 </div>
             </section>
 
@@ -241,13 +246,19 @@
             <section class="sponsors-showcase">
                 <div class="sponsors-title font-orbitron">OFFICIAL PARTNERS</div>
                 <div class="sponsors-grid">
-                    ${sponsors.map(sp => `
-                        <a href="#/partners" class="sponsor-logo-box" title="${sp.name} (${sp.tier} Partner)">
-                            <div style="font-family: var(--font-header); font-size: 16px; font-weight: 900; letter-spacing: 0.1em; color: var(--text-silver); text-shadow: 0 0 5px rgba(255,255,255,0.1); border: 1px solid var(--glass-border); padding: 8px 18px; border-radius: 4px; background: rgba(255,255,255,0.01);">
-                                ${sp.logoText}
-                            </div>
+                    ${sponsors.map(sp => {
+                        const targetUrl = sp.link || sp.website || '#';
+                        const isExternal = targetUrl.startsWith('http');
+                        const targetAttr = isExternal ? 'target="_blank"' : '';
+                        const logoHtml = sp.logo
+                            ? `<img src="${sp.logo}" alt="${sp.name} Logo" style="max-height: 45px; max-width: 150px; object-fit: contain; filter: grayscale(1); transition: filter 0.3s;" onmouseover="this.style.filter='grayscale(0)'" onmouseout="this.style.filter='grayscale(1)'">`
+                            : `<div style="font-family: var(--font-header); font-size: 16px; font-weight: 900; letter-spacing: 0.1em; color: var(--text-silver); text-shadow: 0 0 5px rgba(255,255,255,0.1); border: 1px solid var(--glass-border); padding: 8px 18px; border-radius: 4px; background: rgba(255,255,255,0.01);">${sp.logoText}</div>`;
+                        return `
+                        <a href="${targetUrl}" ${targetAttr} class="sponsor-logo-box" title="${sp.name} (${sp.tier} Partner)" style="display: flex; align-items: center; justify-content: center; min-height: 60px;">
+                            ${logoHtml}
                         </a>
-                    `).join('')}
+                        `;
+                    }).join('')}
                 </div>
             </section>
         `;
