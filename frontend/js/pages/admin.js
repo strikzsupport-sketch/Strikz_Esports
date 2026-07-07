@@ -39,7 +39,6 @@
                     <div class="admin-login-left">
                         <div class="admin-login-left-overlay">
                             <div class="admin-brand-name font-orbitron">strikzesports</div>
-                            <div class="admin-brand-tagline">Remix your vibe. Share your sound.</div>
                         </div>
                     </div>
                     
