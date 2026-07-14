@@ -818,6 +818,7 @@
 
     let googleClientId = null;
     let googleInitialized = false;
+    let googleConfigFetching = false;
 
     async function prefetchGoogleConfig() {
         try {
@@ -876,12 +877,14 @@
     async function initGoogleSignIn() {
         if (googleInitialized) return;
         try {
-            if (!googleClientId) {
+            if (!googleClientId && !googleConfigFetching) {
+                googleConfigFetching = true;
                 const res = await fetch('/api/v1/auth/config?_t=' + Date.now());
                 const json = await res.json();
                 if (json.success) {
                     googleClientId = json.googleClientId;
                 }
+                googleConfigFetching = false;
             }
             if (!googleClientId) {
                 console.warn("Google Client ID is not configured on the backend.");
@@ -1047,8 +1050,8 @@
         if (userInput) userInput.value = '';
         if (passInput) passInput.value = '';
 
-        // Render Google Sign-in button
-        renderGoogleButton();
+        // Render Google Sign-in button with a delay to guarantee modal reflow finishes
+        setTimeout(renderGoogleButton, 150);
 
         // Accessibility: trap focus inside modal
         trapFocus(loginModal);
