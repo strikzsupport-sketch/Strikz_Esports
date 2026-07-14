@@ -66,7 +66,7 @@ const models = {
         prizePool: { type: String },
         startDate: { type: String },
         regCloseDate: { type: String },
-        status: { type: String, enum: ['Open', 'Closed', 'Completed', 'Cancelled'] },
+        status: { type: String, enum: ['Open', 'Closed', 'Temporary Close', 'Slot Full', 'Completed', 'Cancelled'] },
         rules: { type: String },
         ruleBook: { type: String },
         soloRegistrationEnabled: { type: Boolean, default: false },

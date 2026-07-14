@@ -696,6 +696,8 @@
                                 <select id="tourney-status" style="background:#101010; border:1px solid var(--glass-border); padding:10px; color:#fff; border-radius:4px; width: 100%;">
                                     <option value="Open">Open</option>
                                     <option value="Closed">Closed</option>
+                                    <option value="Temporary Close">Temporary Close</option>
+                                    <option value="Slot Full">Slot Full</option>
                                     <option value="Completed">Completed</option>
                                     <option value="Cancelled">Cancelled</option>
                                 </select>
@@ -771,39 +773,48 @@
                         <span class="font-orbitron" style="font-size: 9px; padding: 2px 6px; border-radius: 3px; margin-left: 8px; font-weight: bold; background: ${
                             t.status === 'Open' ? 'rgba(34, 197, 94, 0.15)' :
                             t.status === 'Closed' ? 'rgba(239, 68, 68, 0.15)' :
+                            t.status === 'Temporary Close' ? 'rgba(255, 165, 0, 0.15)' :
+                            t.status === 'Slot Full' ? 'rgba(255, 0, 255, 0.15)' :
                             t.status === 'Completed' ? 'rgba(59, 130, 246, 0.15)' : 'rgba(156, 163, 175, 0.15)'
                         }; color: ${
                             t.status === 'Open' ? '#22c55e' :
                             t.status === 'Closed' ? '#ef4444' :
+                            t.status === 'Temporary Close' ? '#ffa500' :
+                            t.status === 'Slot Full' ? '#ff00ff' :
                             t.status === 'Completed' ? '#3b82f6' : '#9ca3af'
                         };">${(t.status || 'Open').toUpperCase()}</span>
                         <h5 class="font-orbitron" style="font-size: 13px; color: #fff; margin: 2px 0;">${t.name}</h5>
                         <p style="font-size: 11px; color: var(--text-dim);">Prize Pool: <strong style="color: var(--neon-yellow);">${t.prizePool}</strong> | Solo Allowed: <strong>${t.soloRegistrationEnabled !== false ? 'YES' : 'NO'}</strong></p>
                     </div>
-                    <div style="display: flex; gap: 6px;">
-                        ${
-                            t.status === 'Open' ?
-                            `<button class="action-icon-btn reject toggle-status-btn" data-id="${t.id}" data-status="Closed" title="Close Registration"><i class="fa-solid fa-lock"></i></button>` :
-                            `<button class="action-icon-btn approve toggle-status-btn" data-id="${t.id}" data-status="Open" title="Open Registration"><i class="fa-solid fa-unlock"></i></button>`
-                        }
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                        <select class="admin-tourney-status-select" data-id="${t.id}" style="background: rgba(16, 16, 16, 0.8); border: 1px solid var(--glass-border); padding: 5px; color: #fff; border-radius: 4px; font-size: 11px; cursor: pointer;">
+                            <option value="Open" ${t.status === 'Open' ? 'selected' : ''}>Open</option>
+                            <option value="Closed" ${t.status === 'Closed' ? 'selected' : ''}>Closed</option>
+                            <option value="Temporary Close" ${t.status === 'Temporary Close' ? 'selected' : ''}>Temporary Close</option>
+                            <option value="Slot Full" ${t.status === 'Slot Full' ? 'selected' : ''}>Slot Full</option>
+                            <option value="Completed" ${t.status === 'Completed' ? 'selected' : ''}>Completed</option>
+                            <option value="Cancelled" ${t.status === 'Cancelled' ? 'selected' : ''}>Cancelled</option>
+                        </select>
                         <button class="action-icon-btn approve edit-tourney-btn" data-id="${t.id}" title="Edit"><i class="fa-solid fa-pen-to-square"></i></button>
                         <button class="action-icon-btn delete delete-tourney-btn" data-id="${t.id}" title="Delete"><i class="fa-solid fa-trash-can"></i></button>
                     </div>
                 </div>
             `).join('');
 
-            // Bind toggle status
-            listMount.querySelectorAll('.toggle-status-btn').forEach(btn => {
-                btn.onclick = async function() {
+            // Bind status change dropdown
+            listMount.querySelectorAll('.admin-tourney-status-select').forEach(select => {
+                select.onchange = async function() {
                     const id = this.dataset.id;
-                    const status = this.dataset.status;
+                    const status = this.value;
                     try {
                         await window.strikzDb.updateTournament({ id, status });
                         alert(`Tournament status set to ${status} successfully!`);
                         db = await window.strikzDb.fetchSnapshot();
                         loadTournamentsList();
                     } catch (err) {
-                        alert("Failed to toggle status: " + err.message);
+                        alert("Failed to update status: " + err.message);
+                        const t = db.tournaments.find(x => x.id === id);
+                        if (t) this.value = t.status || 'Open';
                     }
                 };
             });

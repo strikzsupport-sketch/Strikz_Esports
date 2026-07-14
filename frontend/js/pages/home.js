@@ -297,6 +297,12 @@
                 } else if (t.status === 'Closed') {
                     badgeStyle = 'background: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; color: #ef4444;';
                     buttonHtml = `<button class="cta-button w-full" disabled style="cursor: not-allowed; opacity: 0.6; background: rgba(255,255,255,0.05); color: #888; border-color: rgba(255,255,255,0.1); box-shadow: none; font-size: 11px;">REGISTRATIONS CLOSED</button>`;
+                } else if (t.status === 'Temporary Close') {
+                    badgeStyle = 'background: rgba(255, 165, 0, 0.15); border: 1px solid #ffa500; color: #ffa500;';
+                    buttonHtml = `<button class="cta-button w-full" disabled style="cursor: not-allowed; opacity: 0.6; background: rgba(255,255,255,0.05); color: #ffa500; border-color: rgba(255, 165, 0, 0.3); box-shadow: none; font-size: 11px;">TEMPORARILY CLOSED</button>`;
+                } else if (t.status === 'Slot Full') {
+                    badgeStyle = 'background: rgba(255, 0, 255, 0.15); border: 1px solid #ff00ff; color: #ff00ff;';
+                    buttonHtml = `<button class="cta-button w-full" disabled style="cursor: not-allowed; opacity: 0.6; background: rgba(255,255,255,0.05); color: #ff00ff; border-color: rgba(255, 0, 255, 0.3); box-shadow: none; font-size: 11px;">SLOTS FULL</button>`;
                 } else if (t.status === 'Completed') {
                     badgeStyle = 'background: rgba(59, 130, 246, 0.15); border: 1px solid #3b82f6; color: #3b82f6;';
                     buttonHtml = `<button class="cta-button w-full" disabled style="cursor: not-allowed; opacity: 0.6; background: rgba(255,255,255,0.05); color: #888; border-color: rgba(255,255,255,0.1); box-shadow: none; font-size: 11px;">CHAMPIONSHIP COMPLETED</button>`;

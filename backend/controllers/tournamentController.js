@@ -150,6 +150,16 @@ const createRegistration = async (req, res, next) => {
             return next(new Error('Championship registration portal is currently closed'));
         }
 
+        if (tourney.status === 'Slot Full') {
+            res.status(400);
+            return next(new Error('Championship slots are currently full'));
+        }
+
+        if (tourney.status === 'Temporary Close') {
+            res.status(400);
+            return next(new Error('Championship registration portal is temporarily closed'));
+        }
+
         if (tourney.status !== 'Open') {
             res.status(400);
             return next(new Error('Championship registration portal is currently closed'));
