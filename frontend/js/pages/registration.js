@@ -5,6 +5,7 @@
 (function() {
     function renderRegistration(container) {
         if (!window.strikzAuth || !window.strikzAuth.isLoggedIn()) {
+            alert("Login first to register squad");
             if (window.strikzOpenLoginModal) {
                 window.strikzOpenLoginModal();
             }
