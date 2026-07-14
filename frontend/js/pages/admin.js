@@ -690,6 +690,17 @@
                                 <input type="date" id="tourney-close" required style="color: #fff; display: block;">
                             </div>
                         </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="tourney-status">Registration Status</label>
+                                <select id="tourney-status" style="background:#101010; border:1px solid var(--glass-border); padding:10px; color:#fff; border-radius:4px; width: 100%;">
+                                    <option value="Open">Open</option>
+                                    <option value="Closed">Closed</option>
+                                    <option value="Completed">Completed</option>
+                                    <option value="Cancelled">Cancelled</option>
+                                </select>
+                            </div>
+                        </div>
                         <div class="form-group">
                             <label for="tourney-rules">Official Rules Overview</label>
                             <input type="text" id="tourney-rules" placeholder="Brief rules overview..." required style="color:#fff;">
@@ -734,6 +745,7 @@
         const bannerFileInput = document.getElementById('tourney-banner-upload');
         const bannerBase64Input = document.getElementById('tourney-banner-base64');
         const saveBtn = document.getElementById('btn-save-tourney');
+        const statusSelect = document.getElementById('tourney-status');
 
         // Bind banner file loader
         if (bannerFileInput) {
@@ -756,6 +768,15 @@
                 <div class="glass-panel" style="padding: 15px; display: flex; justify-content: space-between; align-items: center; border-color: ${t.status === 'Open' ? 'var(--neon-green-border)' : 'var(--glass-border)'};">
                     <div>
                         <span class="font-orbitron" style="font-size: 10px; color: var(--neon-orange);">${t.category.toUpperCase()} | ${t.game.toUpperCase()}</span>
+                        <span class="font-orbitron" style="font-size: 9px; padding: 2px 6px; border-radius: 3px; margin-left: 8px; font-weight: bold; background: ${
+                            t.status === 'Open' ? 'rgba(34, 197, 94, 0.15)' :
+                            t.status === 'Closed' ? 'rgba(239, 68, 68, 0.15)' :
+                            t.status === 'Completed' ? 'rgba(59, 130, 246, 0.15)' : 'rgba(156, 163, 175, 0.15)'
+                        }; color: ${
+                            t.status === 'Open' ? '#22c55e' :
+                            t.status === 'Closed' ? '#ef4444' :
+                            t.status === 'Completed' ? '#3b82f6' : '#9ca3af'
+                        };">${(t.status || 'Open').toUpperCase()}</span>
                         <h5 class="font-orbitron" style="font-size: 13px; color: #fff; margin: 2px 0;">${t.name}</h5>
                         <p style="font-size: 11px; color: var(--text-dim);">Prize Pool: <strong style="color: var(--neon-yellow);">${t.prizePool}</strong> | Solo Allowed: <strong>${t.soloRegistrationEnabled !== false ? 'YES' : 'NO'}</strong></p>
                     </div>
@@ -799,6 +820,9 @@
                         rulesInput.value = t.rules;
                         rulebookInput.value = t.ruleBook || t.rules || '';
                         bannerBase64Input.value = t.image || '';
+                        if (statusSelect) {
+                            statusSelect.value = t.status || 'Open';
+                        }
                         
                         saveBtn.querySelector('.btn-text').textContent = 'UPDATE TOURNAMENT';
                     }
@@ -822,7 +846,7 @@
                 rules: rulesInput.value.trim(),
                 ruleBook: rulebookInput.value.trim(),
                 image: bannerBase64Input.value.trim() || 'assets/tournament_banner.png',
-                status: 'Open'
+                status: statusSelect ? statusSelect.value : 'Open'
             };
 
             try {
@@ -838,6 +862,7 @@
                 form.reset();
                 editIdInput.value = '';
                 bannerBase64Input.value = '';
+                if (statusSelect) statusSelect.value = 'Open';
                 saveBtn.querySelector('.btn-text').textContent = 'SAVE TOURNAMENT';
                 
                 db = await window.strikzDb.fetchSnapshot();

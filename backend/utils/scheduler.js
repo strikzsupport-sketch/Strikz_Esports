@@ -129,24 +129,47 @@ const checkTournamentReminders = async () => {
     }
 };
 
+// 3. Automatically close tournaments when their start date has arrived
+const autoCloseTournaments = async () => {
+    try {
+        const now = new Date();
+        const todayStr = now.toISOString().split('T')[0]; // Format: "YYYY-MM-DD"
+
+        const result = await models.Tournament.updateMany(
+            { status: 'Open', startDate: { $lte: todayStr } },
+            { $set: { status: 'Closed' } }
+        );
+
+        if (result.modifiedCount > 0) {
+            console.log(`[SCHEDULER] Automatically closed ${result.modifiedCount} tournament(s) that have already started.`);
+        }
+    } catch (e) {
+        console.error('[SCHEDULER ERROR] Auto-closing tournaments failed:', e.message);
+    }
+};
+
 // Start the scheduler — keep references to clear on graceful shutdown
 let queueInterval = null;
 let reminderInterval = null;
+let autoCloseInterval = null;
 
 const startEmailScheduler = () => {
     console.log('[SCHEDULER] Strikz Esports Email Scheduler online.');
 
     queueInterval = setInterval(processQueue, 60 * 1000);
     reminderInterval = setInterval(checkTournamentReminders, 60 * 60 * 1000);
+    autoCloseInterval = setInterval(autoCloseTournaments, 15 * 60 * 1000); // Check every 15 minutes
 
     setTimeout(processQueue, 5000);
     setTimeout(checkTournamentReminders, 15000);
+    setTimeout(autoCloseTournaments, 8000); // Initial check on startup
 };
 
 // Graceful shutdown — clears intervals to prevent memory leaks
 const stopEmailScheduler = () => {
     if (queueInterval) clearInterval(queueInterval);
     if (reminderInterval) clearInterval(reminderInterval);
+    if (autoCloseInterval) clearInterval(autoCloseInterval);
     console.log('[SCHEDULER] Email scheduler stopped.');
 };
 

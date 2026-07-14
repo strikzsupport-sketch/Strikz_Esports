@@ -208,7 +208,7 @@ const createTournament = async (req, res, next) => {
             ...data,
             soloRegistrationEnabled: !!data.soloRegistrationEnabled,
             featured: !!data.featured,
-            status: 'Open'
+            status: data.status || 'Open'
         });
         await logAdminAction(req, 'CREATE_TOURNAMENT', { id: tourneyId, name });
         res.status(201).json({ success: true, message: 'Tournament arena initialized successfully' });
