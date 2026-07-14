@@ -787,7 +787,7 @@
                         <p style="font-size: 11px; color: var(--text-dim);">Prize Pool: <strong style="color: var(--neon-yellow);">${t.prizePool}</strong> | Solo Allowed: <strong>${t.soloRegistrationEnabled !== false ? 'YES' : 'NO'}</strong></p>
                     </div>
                     <div style="display: flex; gap: 8px; align-items: center;">
-                        <select class="admin-tourney-status-select" data-id="${t.id}" style="background: rgba(16, 16, 16, 0.8); border: 1px solid var(--glass-border); padding: 5px; color: #fff; border-radius: 4px; font-size: 11px; cursor: pointer;">
+                        <select class="admin-tourney-status-select" data-id="${t.id}">
                             <option value="Open" ${t.status === 'Open' ? 'selected' : ''}>Open</option>
                             <option value="Closed" ${t.status === 'Closed' ? 'selected' : ''}>Closed</option>
                             <option value="Temporary Close" ${t.status === 'Temporary Close' ? 'selected' : ''}>Temporary Close</option>

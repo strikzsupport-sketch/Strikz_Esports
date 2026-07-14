@@ -2158,6 +2158,28 @@ button, input, select, textarea {
     flex-direction: column;
     gap: 10px;
 }
+.admin-tourney-status-select {
+    background: rgba(16, 16, 16, 0.85);
+    border: 1px solid var(--glass-border);
+    padding: 6px 10px;
+    color: #fff;
+    border-radius: 4px;
+    font-size: 11px;
+    cursor: pointer;
+    outline: none;
+    transition: all 0.2s ease;
+    font-weight: 600;
+    font-family: var(--font-header);
+}
+.admin-tourney-status-select:hover, .admin-tourney-status-select:focus {
+    border-color: var(--neon-cyan);
+    box-shadow: 0 0 8px rgba(0, 240, 255, 0.25);
+}
+.admin-tourney-status-select option {
+    background: #101010;
+    color: #fff;
+    padding: 5px;
+}
 .admin-tab-btn {
     text-align: left;
     padding: 14px 20px;
