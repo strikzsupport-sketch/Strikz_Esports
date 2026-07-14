@@ -352,14 +352,19 @@
         // INTERCEPT REGISTRATION CLICKS AND FORBID LOGGED-OUT USERS
         document.querySelectorAll('.btn-register-intercept').forEach(btn => {
             btn.addEventListener('click', function(e) {
-                if (!window.strikzAuth.isLoggedIn()) {
+                if (!window.strikzAuth || !window.strikzAuth.isLoggedIn()) {
                     e.preventDefault();
                     if (window.strikzPlayClickSound) {
                         window.strikzPlayClickSound();
                     }
-                    const loginModal = document.getElementById('login-modal');
-                    if (loginModal) {
-                        loginModal.classList.add('active');
+                    alert("Login first to register squad");
+                    if (window.strikzOpenLoginModal) {
+                        window.strikzOpenLoginModal();
+                    } else {
+                        const loginModal = document.getElementById('login-modal');
+                        if (loginModal) {
+                            loginModal.classList.add('active');
+                        }
                     }
                 }
             });
