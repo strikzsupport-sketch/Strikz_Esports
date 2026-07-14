@@ -8,6 +8,9 @@
 
     async function renderMyTeam(container) {
         if (!window.strikzAuth || !window.strikzAuth.isLoggedIn()) {
+            if (window.strikzOpenLoginModal) {
+                window.strikzOpenLoginModal();
+            }
             container.innerHTML = `
                 <section class="container bg-section-black reveal" style="padding-top: 80px; margin-bottom: 80px; max-width: 600px; text-align: center;">
                     <div style="padding: 20px 10px;">
@@ -27,9 +30,11 @@
             if (btn) {
                 btn.onclick = function() {
                     if (window.strikzPlayClickSound) window.strikzPlayClickSound();
-                    const loginModal = document.getElementById('login-modal');
-                    if (loginModal) {
-                        loginModal.classList.add('active');
+                    if (window.strikzOpenLoginModal) {
+                        window.strikzOpenLoginModal();
+                    } else {
+                        const loginModal = document.getElementById('login-modal');
+                        if (loginModal) loginModal.classList.add('active');
                     }
                 };
             }

@@ -5,6 +5,9 @@
 (function() {
     function renderRegistration(container) {
         if (!window.strikzAuth || !window.strikzAuth.isLoggedIn()) {
+            if (window.strikzOpenLoginModal) {
+                window.strikzOpenLoginModal();
+            }
             container.innerHTML = `
                 <section class="container bg-section-black" style="padding-top: 80px; margin-bottom: 80px; max-width: 600px;">
                     <div class="glass-panel text-center" style="padding: 50px 30px; border-color: var(--neon-yellow-border);">
