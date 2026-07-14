@@ -1169,6 +1169,39 @@
         initMusicToggle();
         updateAuthUI();
 
+        // Mobile Bottom Menu Toggle
+        const mobMoreTrigger = document.getElementById('mob-more-trigger');
+        const mobMoreMenu = document.getElementById('mobile-more-menu');
+        const mobMoreCloseBtn = document.getElementById('mobile-more-menu-close-btn');
+        const mobMoreOverlay = mobMoreMenu ? mobMoreMenu.querySelector('.mobile-more-menu-overlay') : null;
+
+        const openMoreMenu = () => {
+            if (mobMoreMenu) {
+                mobMoreMenu.classList.add('active');
+                playSound(clickSfx);
+            }
+        };
+
+        const closeMoreMenu = () => {
+            if (mobMoreMenu) {
+                mobMoreMenu.classList.remove('active');
+                playSound(clickSfx);
+            }
+        };
+
+        if (mobMoreTrigger) mobMoreTrigger.addEventListener('click', openMoreMenu);
+        if (mobMoreCloseBtn) mobMoreCloseBtn.addEventListener('click', closeMoreMenu);
+        if (mobMoreOverlay) mobMoreOverlay.addEventListener('click', closeMoreMenu);
+
+        // Also close More Menu if any link inside it is clicked
+        if (mobMoreMenu) {
+            mobMoreMenu.querySelectorAll('.mobile-more-link').forEach(link => {
+                link.addEventListener('click', () => {
+                    mobMoreMenu.classList.remove('active');
+                });
+            });
+        }
+
         // Check for redirect Google Sign-in credential
         const urlParams = new URLSearchParams(window.location.search);
         const googleCred = urlParams.get('google_credential');

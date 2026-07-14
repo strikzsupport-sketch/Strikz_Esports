@@ -63,7 +63,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <!-- Custom Style Sheet (versioned for cache busting) -->
-    <link rel="stylesheet" href="css/style.css?v=1.1.3">
+    <link rel="stylesheet" href="css/style.css?v=1.1.4">
 
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="assets/favicon.png">
@@ -167,23 +167,41 @@
                     </div>
                 </div>
             </div>
-            <nav class="mobile-horizontal-nav" aria-label="Mobile navigation">
-                <ul role="list">
-                    <li><a href="#/" class="mobile-link active" id="mob-home"><i class="fa-solid fa-house" aria-hidden="true"></i> <span>Home</span></a></li>
-                    <li><a href="#/registration" class="mobile-link" id="mob-register"><i class="fa-solid fa-gamepad" aria-hidden="true"></i> <span>Competitions</span></a></li>
-                    <li><a href="#/about" class="mobile-link" id="mob-about"><i class="fa-solid fa-shield-halved" aria-hidden="true"></i> <span>About</span></a></li>
-                    <li><a href="#/team" class="mobile-link" id="mob-team"><i class="fa-solid fa-users" aria-hidden="true"></i> <span>Team</span></a></li>
-                    <li><a href="#/achievements" class="mobile-link" id="mob-achievements"><i class="fa-solid fa-trophy" aria-hidden="true"></i> <span>Winners</span></a></li>
-                    <li><a href="#/partners" class="mobile-link" id="mob-partners"><i class="fa-solid fa-handshake" aria-hidden="true"></i> <span>Partners</span></a></li>
-                    <li><a href="#/sponsors" class="mobile-link" id="mob-sponsors"><i class="fa-solid fa-rectangle-ad" aria-hidden="true"></i> <span>Sponsors</span></a></li>
-                    <li><a href="#/gallery" class="mobile-link" id="mob-gallery"><i class="fa-solid fa-images" aria-hidden="true"></i> <span>Gallery</span></a></li>
-                    <li><a href="#/news" class="mobile-link" id="mob-news"><i class="fa-solid fa-newspaper" aria-hidden="true"></i> <span>News</span></a></li>
-                    <li><a href="#/earning" class="mobile-link" id="mob-earning"><i class="fa-solid fa-hand-holding-dollar" aria-hidden="true"></i> <span>Earning</span></a></li>
-                    <li><a href="#/contact" class="mobile-link" id="mob-contact"><i class="fa-solid fa-envelope" aria-hidden="true"></i> <span>Support</span></a></li>
-                    <li style="display: none !important;"><a href="#/admin" class="mobile-link" id="mob-admin"><i class="fa-solid fa-lock" aria-hidden="true"></i> <span>Admin</span></a></li>
-                </ul>
-            </nav>
         </header>
+
+        <!-- Fixed Bottom Navigation Bar for Mobile Viewports -->
+        <nav class="mobile-horizontal-nav" aria-label="Mobile navigation">
+            <ul role="list">
+                <li><a href="#/" class="mobile-link active" id="mob-home"><i class="fa-solid fa-house" aria-hidden="true"></i> <span>Home</span></a></li>
+                <li><a href="#/registration" class="mobile-link" id="mob-register"><i class="fa-solid fa-gamepad" aria-hidden="true"></i> <span>Play</span></a></li>
+                <li><a href="#/myteam" class="mobile-link" id="mob-myteam"><i class="fa-solid fa-users-gear" aria-hidden="true"></i> <span>My Team</span></a></li>
+                <li><a href="#/news" class="mobile-link" id="mob-news"><i class="fa-solid fa-newspaper" aria-hidden="true"></i> <span>News</span></a></li>
+                <li><a href="javascript:void(0);" class="mobile-link" id="mob-more-trigger"><i class="fa-solid fa-bars" aria-hidden="true"></i> <span>Menu</span></a></li>
+            </ul>
+        </nav>
+
+        <!-- Mobile Bottom Drawer/Overlay Menu -->
+        <div id="mobile-more-menu" class="mobile-more-menu" role="dialog" aria-modal="true" aria-label="More navigation links">
+            <div class="mobile-more-menu-overlay"></div>
+            <div class="mobile-more-menu-content glass-panel">
+                <div class="mobile-more-menu-header">
+                    <span class="font-orbitron">MORE NAVIGATION</span>
+                    <button class="mobile-more-menu-close" id="mobile-more-menu-close-btn" aria-label="Close menu">&times;</button>
+                </div>
+                <div class="mobile-more-menu-grid">
+                    <a href="#/about" class="mobile-more-link mobile-link" id="mob-about"><i class="fa-solid fa-shield-halved"></i><span>About Us</span></a>
+                    <a href="#/team" class="mobile-more-link mobile-link" id="mob-team"><i class="fa-solid fa-users"></i><span>Official Team</span></a>
+                    <a href="#/history" class="mobile-more-link mobile-link" id="mob-history"><i class="fa-solid fa-calendar-days"></i><span>History</span></a>
+                    <a href="#/achievements" class="mobile-more-link mobile-link" id="mob-achievements"><i class="fa-solid fa-trophy"></i><span>Winners</span></a>
+                    <a href="#/partners" class="mobile-more-link mobile-link" id="mob-partners"><i class="fa-solid fa-handshake"></i><span>Partners</span></a>
+                    <a href="#/sponsors" class="mobile-more-link mobile-link" id="mob-sponsors"><i class="fa-solid fa-rectangle-ad"></i><span>Sponsors</span></a>
+                    <a href="#/gallery" class="mobile-more-link mobile-link" id="mob-gallery"><i class="fa-solid fa-images"></i><span>Gallery</span></a>
+                    <a href="#/earning" class="mobile-more-link mobile-link" id="mob-earning"><i class="fa-solid fa-hand-holding-dollar"></i><span>Earning</span></a>
+                    <a href="#/contact" class="mobile-more-link mobile-link" id="mob-contact"><i class="fa-solid fa-envelope"></i><span>Support</span></a>
+                    <div style="display: none !important;"><a href="#/admin" class="mobile-more-link mobile-link" id="mob-admin"><i class="fa-solid fa-lock"></i><span>Admin Portal</span></a></div>
+                </div>
+            </div>
+        </div>
 
         <!-- Quick Portal Bar (Squad HQ, DMs, Inbox) -->
         <div id="quick-portal-bar" class="quick-portal-bar hidden" aria-label="Quick access portal"></div>
@@ -431,7 +449,7 @@
     <!-- JS Scripts — data and core libraries first, app last -->
     <script src="js/data.js?v=1.1.2"></script>
     <script src="js/chatbot.js?v=1.1.2"></script>
-    <script src="js/pages/home.js?v=1.1.3"></script>
+    <script src="js/pages/home.js?v=1.1.4"></script>
     <script src="js/pages/about.js?v=1.1.3"></script>
     <script src="js/pages/team.js?v=1.1.2"></script>
     <script src="js/pages/history.js?v=1.1.2"></script>
@@ -443,7 +461,7 @@
     <script src="js/pages/contact.js?v=1.1.2"></script>
     <script src="js/pages/registration.js?v=1.1.2"></script>
     <script src="js/pages/myteam.js?v=1.1.2"></script>
-    <script src="js/pages/admin.js?v=1.1.3"></script>
+    <script src="js/pages/admin.js?v=1.1.4"></script>
     <script src="js/pages/earning.js?v=1.1.2"></script>
     <script src="js/app.js?v=1.1.2"></script>
 </body>
