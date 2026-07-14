@@ -1175,14 +1175,22 @@
         const mobMoreCloseBtn = document.getElementById('mobile-more-menu-close-btn');
         const mobMoreOverlay = mobMoreMenu ? mobMoreMenu.querySelector('.mobile-more-menu-overlay') : null;
 
-        const openMoreMenu = () => {
+        const openMoreMenu = (e) => {
+            if (e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
             if (mobMoreMenu) {
                 mobMoreMenu.classList.add('active');
                 playSound(clickSfx);
             }
         };
 
-        const closeMoreMenu = () => {
+        const closeMoreMenu = (e) => {
+            if (e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
             if (mobMoreMenu) {
                 mobMoreMenu.classList.remove('active');
                 playSound(clickSfx);

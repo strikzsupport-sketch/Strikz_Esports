@@ -3097,7 +3097,8 @@ button, input, select, textarea {
         list-style: none;
         gap: 0;
     }
-    .mobile-horizontal-nav .mobile-link {
+    .mobile-horizontal-nav .mobile-link,
+    .mobile-horizontal-nav .mob-more-trigger-btn {
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -3113,18 +3114,25 @@ button, input, select, textarea {
         transition: all 0.2s ease;
         white-space: nowrap;
         background: none !important;
+        cursor: pointer;
+        text-decoration: none;
     }
-    .mobile-horizontal-nav .mobile-link i {
+    .mobile-horizontal-nav .mobile-link i,
+    .mobile-horizontal-nav .mob-more-trigger-btn i {
         font-size: 16px;
         color: var(--text-dim);
         transition: all 0.2s ease;
     }
     .mobile-horizontal-nav .mobile-link.active,
-    .mobile-horizontal-nav .mobile-link:hover {
+    .mobile-horizontal-nav .mobile-link:hover,
+    .mobile-horizontal-nav .mob-more-trigger-btn:hover,
+    .mobile-horizontal-nav .mob-more-trigger-btn:active {
         color: var(--neon-orange);
     }
     .mobile-horizontal-nav .mobile-link.active i,
-    .mobile-horizontal-nav .mobile-link:hover i {
+    .mobile-horizontal-nav .mobile-link:hover i,
+    .mobile-horizontal-nav .mob-more-trigger-btn:hover i,
+    .mobile-horizontal-nav .mob-more-trigger-btn:active i {
         color: var(--neon-orange);
         filter: drop-shadow(0 0 5px var(--neon-orange-glow));
     }
