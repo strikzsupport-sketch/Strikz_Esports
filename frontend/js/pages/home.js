@@ -278,34 +278,53 @@
 
         // INJECT TOURNAMENT CARDS
         const tournamentsGrid = document.getElementById('home-tournaments-grid');
-        const openTourneys = tournaments.filter(t => t.status === 'Open');
+        const displayedTourneys = tournaments.filter(t => t.status !== 'Cancelled');
         
-        if (openTourneys.length === 0) {
+        if (displayedTourneys.length === 0) {
             tournamentsGrid.innerHTML = `
                 <div class="glass-panel text-center" style="grid-column: 1 / -1; padding: 50px;">
                     <p style="color: var(--text-dim);">No active tournaments open for registration currently. Check back soon!</p>
                 </div>
             `;
         } else {
-            tournamentsGrid.innerHTML = openTourneys.map(t => `
-                <div class="tournament-card">
-                    <div class="tournament-img-wrap">
-                        <img src="${t.image}" alt="${t.name}" class="tournament-img">
-                        <span class="tournament-badge">${t.status}</span>
-                    </div>
-                    <div class="tournament-info">
-                        <div class="tournament-game">${t.game.toUpperCase()}</div>
-                        <h3 class="tournament-name">${t.name}</h3>
-                        <div class="tournament-stats-grid">
-                            <div class="stat-item"><i class="fa-solid fa-trophy"></i> <span>Pool: ${t.prizePool}</span></div>
-                            <div class="stat-item"><i class="fa-solid fa-calendar-days"></i> <span>Starts: ${window.strikzFormatDate(t.startDate)}</span></div>
-                            <div class="stat-item"><i class="fa-solid fa-gamepad"></i> <span>Mode: ${t.mode}</span></div>
-                            <div class="stat-item"><i class="fa-solid fa-clock"></i> <span>Reg Close: ${window.strikzFormatDate(t.regCloseDate)}</span></div>
+            tournamentsGrid.innerHTML = displayedTourneys.map(t => {
+                let badgeStyle = '';
+                let buttonHtml = '';
+                
+                if (t.status === 'Open') {
+                    badgeStyle = 'background: rgba(34, 197, 94, 0.15); border: 1px solid #22c55e; color: #22c55e;';
+                    buttonHtml = `<a href="#/registration" class="cta-button btn-neon-orange w-full btn-register-intercept">REGISTER NOW</a>`;
+                } else if (t.status === 'Closed') {
+                    badgeStyle = 'background: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; color: #ef4444;';
+                    buttonHtml = `<button class="cta-button w-full" disabled style="cursor: not-allowed; opacity: 0.6; background: rgba(255,255,255,0.05); color: #888; border-color: rgba(255,255,255,0.1); box-shadow: none; font-size: 11px;">REGISTRATIONS CLOSED</button>`;
+                } else if (t.status === 'Completed') {
+                    badgeStyle = 'background: rgba(59, 130, 246, 0.15); border: 1px solid #3b82f6; color: #3b82f6;';
+                    buttonHtml = `<button class="cta-button w-full" disabled style="cursor: not-allowed; opacity: 0.6; background: rgba(255,255,255,0.05); color: #888; border-color: rgba(255,255,255,0.1); box-shadow: none; font-size: 11px;">CHAMPIONSHIP COMPLETED</button>`;
+                } else {
+                    badgeStyle = 'background: rgba(156, 163, 175, 0.15); border: 1px solid #9ca3af; color: #9ca3af;';
+                    buttonHtml = `<button class="cta-button w-full" disabled style="cursor: not-allowed; opacity: 0.6; background: rgba(255,255,255,0.05); color: #888; border-color: rgba(255,255,255,0.1); box-shadow: none; font-size: 11px;">CANCELLED</button>`;
+                }
+
+                return `
+                    <div class="tournament-card">
+                        <div class="tournament-img-wrap">
+                            <img src="${t.image}" alt="${t.name}" class="tournament-img">
+                            <span class="tournament-badge" style="${badgeStyle}">${t.status}</span>
                         </div>
-                        <a href="#/registration" class="cta-button btn-neon-orange w-full btn-register-intercept">REGISTER NOW</a>
+                        <div class="tournament-info">
+                            <div class="tournament-game">${t.game.toUpperCase()}</div>
+                            <h3 class="tournament-name">${t.name}</h3>
+                            <div class="tournament-stats-grid">
+                                <div class="stat-item"><i class="fa-solid fa-trophy"></i> <span>Pool: ${t.prizePool}</span></div>
+                                <div class="stat-item"><i class="fa-solid fa-calendar-days"></i> <span>Starts: ${window.strikzFormatDate(t.startDate)}</span></div>
+                                <div class="stat-item"><i class="fa-solid fa-gamepad"></i> <span>Mode: ${t.mode}</span></div>
+                                <div class="stat-item"><i class="fa-solid fa-clock"></i> <span>Reg Close: ${window.strikzFormatDate(t.regCloseDate)}</span></div>
+                            </div>
+                            ${buttonHtml}
+                        </div>
                     </div>
-                </div>
-            `).join('');
+                `;
+            }).join('');
         }
 
         // INITIALIZE COUNTDOWN
