@@ -137,6 +137,10 @@
             return res.team;
         },
 
+        updateMyTeam: async function(team) {
+            return await apiRequest('/my-team', 'PUT', team);
+        },
+
         acceptTeamInvite: async function(teamId) {
             return await apiRequest('/my-team/accept-invite', 'POST', { teamId });
         },

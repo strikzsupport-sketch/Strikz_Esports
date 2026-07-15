@@ -215,8 +215,11 @@
                     </div>
 
                     <!-- Squad Actions -->
-                    <div style="margin-top: 35px; padding-top: 20px; border-top: 1px solid var(--glass-border); display: flex; justify-content: flex-end; gap: 15px;">
+                    <div style="margin-top: 35px; padding-top: 20px; border-top: 1px solid var(--glass-border); display: flex; justify-content: flex-end; gap: 15px; flex-wrap: wrap;">
                         ${team.captain_uid === user.uid ? `
+                            <button class="cta-button btn-neon-yellow" id="btn-edit-team" style="padding: 10px 22px; font-size: 12px; font-weight:800; display:flex; align-items:center; gap:8px; color:#000 !important;">
+                                <i class="fa-solid fa-pen-to-square"></i> EDIT SQUAD
+                            </button>
                             <button class="cta-button btn-neon-orange" id="btn-disband-team" style="padding: 10px 22px; font-size: 12px; font-weight:800; display:flex; align-items:center; gap:8px;">
                                 <i class="fa-solid fa-burst"></i> DISBAND TEAM
                             </button>
@@ -290,6 +293,15 @@
                     } catch (err) {
                         alert("Leave team failed: " + err.message);
                     }
+                };
+            }
+
+            // Bind Edit Team button
+            const editBtn = document.getElementById('btn-edit-team');
+            if (editBtn) {
+                editBtn.onclick = function() {
+                    if (window.strikzPlayClickSound) window.strikzPlayClickSound();
+                    renderEditTeamForm(user, team, container);
                 };
             }
 
@@ -1049,65 +1061,7 @@
         }
 
         // Bind Autocomplete Dropdown Search
-        const searchInputs = form.querySelectorAll('.search-gamer-input');
-        searchInputs.forEach(input => {
-            const dropdown = input.parentNode.querySelector('.autocomplete-dropdown');
-            if (dropdown) {
-                input.oninput = async function() {
-                    const query = input.value.trim().toLowerCase();
-                    if (!query || query.length < 2) {
-                        dropdown.style.display = 'none';
-                        dropdown.innerHTML = '';
-                        return;
-                    }
-                    try {
-                        const response = await fetch(`/api/v1/auth/users/search?query=${encodeURIComponent(query)}`, {
-                            headers: {
-                                'Authorization': `Bearer ${localStorage.getItem('strikz_jwt_token') || sessionStorage.getItem('strikz_jwt_token')}`
-                            }
-                        });
-                        const resData = await response.json();
-                        const users = resData.users || [];
-                        if (users.length === 0) {
-                            dropdown.innerHTML = `<div style="padding:8px 12px; color:var(--text-dim); font-size:11px;">No gamers found</div>`;
-                        } else {
-                            dropdown.innerHTML = users.map(u => `
-                                <div class="autocomplete-item" data-uid="${u.uid}" data-username="${u.username}" style="display:flex; gap:8px; align-items:center; padding:6px 10px; cursor:pointer; border-bottom:1px solid rgba(255,255,255,0.02); transition:background 0.2s;">
-                                    <img src="${u.avatar || 'assets/default-avatar.png'}" style="width:20px; height:20px; border-radius:50%; object-fit:cover;">
-                                    <div>
-                                        <div style="font-size:11px; color:#fff; font-weight:700;">${u.username}</div>
-                                        <div style="font-size:9px; color:var(--neon-cyan);">${u.uid}</div>
-                                    </div>
-                                </div>
-                            `).join('');
-                            
-                            dropdown.querySelectorAll('.autocomplete-item').forEach(item => {
-                                item.onclick = function() {
-                                    input.value = this.dataset.uid;
-                                    dropdown.style.display = 'none';
-                                    
-                                    // Autofill Real Name with Username
-                                    const card = input.closest('div[style*="background"]');
-                                    if (card) {
-                                        const realInput = card.querySelector('.team-member-real');
-                                        if (realInput) realInput.value = this.dataset.username;
-                                    }
-                                };
-                            });
-                        }
-                        dropdown.style.display = 'block';
-                    } catch (err) {
-                        console.error(err);
-                    }
-                };
-
-                document.addEventListener('click', function(e) {
-                    if (e.target !== input && e.target !== dropdown && !dropdown.contains(e.target)) {
-                        dropdown.style.display = 'none';
-                    }
-                });
-            }
-        });
+        bindAutocompleteSearchInputs(form);
 
         form.onsubmit = async function(e) {
             if (e) e.preventDefault();
@@ -1282,8 +1236,317 @@
         if (window.strikzInitSpotlightEffect) window.strikzInitSpotlightEffect();
     }
 
-    // Attach to global window
-    window.renderMyTeam = renderMyTeam;
+    function bindAutocompleteSearchInputs(formElement) {
+        const searchInputs = formElement.querySelectorAll('.search-gamer-input');
+        searchInputs.forEach(input => {
+            const dropdown = input.parentNode.querySelector('.autocomplete-dropdown');
+            if (dropdown) {
+                input.oninput = async function() {
+                    const query = input.value.trim().toLowerCase();
+                    if (!query || query.length < 2) {
+                        dropdown.style.display = 'none';
+                        dropdown.innerHTML = '';
+                        return;
+                    }
+                    try {
+                        const response = await fetch(`/api/v1/auth/users/search?query=${encodeURIComponent(query)}`, {
+                            headers: {
+                                'Authorization': `Bearer ${localStorage.getItem('strikz_jwt_token') || sessionStorage.getItem('strikz_jwt_token')}`
+                            }
+                        });
+                        const resData = await response.json();
+                        const users = resData.users || [];
+                        if (users.length === 0) {
+                            dropdown.innerHTML = `<div style="padding:8px 12px; color:var(--text-dim); font-size:11px;">No gamers found</div>`;
+                        } else {
+                            dropdown.innerHTML = users.map(u => `
+                                <div class="autocomplete-item" data-uid="${u.uid}" data-username="${u.username}" style="display:flex; gap:8px; align-items:center; padding:6px 10px; cursor:pointer; border-bottom:1px solid rgba(255,255,255,0.02); transition:background 0.2s;">
+                                    <img src="${u.avatar || 'assets/default-avatar.png'}" style="width:20px; height:20px; border-radius:50%; object-fit:cover;">
+                                    <div>
+                                        <div style="font-size:11px; color:#fff; font-weight:700;">${u.username}</div>
+                                        <div style="font-size:9px; color:var(--neon-cyan);">${u.uid}</div>
+                                    </div>
+                                </div>
+                            `).join('');
+                            
+                            dropdown.querySelectorAll('.autocomplete-item').forEach(item => {
+                                item.onclick = function() {
+                                    input.value = this.dataset.uid;
+                                    dropdown.style.display = 'none';
+                                    
+                                    const card = input.closest('div[style*="background"]');
+                                    if (card) {
+                                        const realInput = card.querySelector('.team-member-real');
+                                        if (realInput) realInput.value = this.dataset.username;
+                                    }
+                                };
+                            });
+                        }
+                        dropdown.style.display = 'block';
+                    } catch (err) {
+                        console.error(err);
+                    }
+                };
+
+                document.addEventListener('click', function(e) {
+                    if (e.target !== input && e.target !== dropdown && !dropdown.contains(e.target)) {
+                        dropdown.style.display = 'none';
+                    }
+                });
+            }
+        });
+    }
+
+    function renderEditTeamForm(user, team, container) {
+        const capMember = (team.members || []).find(m => m.user_uid === user.uid) || (team.members || [])[0];
+        
+        container.innerHTML = `
+            <section class="container bg-section-black reveal" style="padding-top: 40px; margin-bottom: 80px; max-width: 800px;">
+                <div class="section-header" style="margin-bottom: 30px;">
+                    <span class="section-subtitle">UPDATE SQUAD DETAILS</span>
+                    <h2 class="section-title">EDIT <span>SQUAD</span></h2>
+                    <div class="section-divider"></div>
+                </div>
+
+                <div class="glass-panel" style="padding: 40px; border-color: var(--neon-orange-border);">
+                    <form id="edit-team-form" onsubmit="return false;">
+                        
+                        <div class="form-group">
+                            <label>TEAM LOGO</label>
+                            <div style="display: flex; gap: 20px; align-items: center; margin-bottom: 15px;">
+                                <div id="edit-team-logo-preview" style="width: 80px; height: 80px; border: 1.5px solid var(--glass-border); border-radius: 8px; display: flex; align-items: center; justify-content: center; overflow: hidden; background: rgba(0,0,0,0.5);">
+                                    <img src="${team.logo || 'https://api.dicebear.com/7.x/identicon/svg?seed=' + encodeURIComponent(team.name)}" style="width:100%; height:100%; object-fit:cover;">
+                                </div>
+                                <div>
+                                    <button type="button" class="cta-button btn-neon-yellow" id="btn-upload-edit-team-logo" style="padding: 8px 16px; font-size:11px; font-weight:800; color:#000 !important;">
+                                        UPLOAD NEW LOGO
+                                    </button>
+                                    <input type="file" id="edit-team-logo-file" accept="image/*" style="display: none;">
+                                    <input type="hidden" id="edit-team-logo-url" value="${team.logo || ''}">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Esports Squad Name</label>
+                                <input type="text" id="edit-team-name" value="${team.name}" required style="color:#fff;">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Squad Bio / Description</label>
+                            <textarea id="edit-team-desc" rows="3" required style="color:#fff; background: rgba(0, 0, 0, 0.3); border: 1px solid var(--glass-border); border-radius: 4px; padding: 10px; width: 100%; resize: vertical;">${team.description}</textarea>
+                        </div>
+
+                        <h4 class="font-orbitron" style="font-size: 13px; color: var(--neon-yellow); margin: 30px 0 15px 0; border-bottom: 1px solid var(--glass-border); padding-bottom: 6px;">ROSTER LINE-UP (4 CORE MEMBERS)</h4>
+                        
+                        <!-- Captain (Member 1) -->
+                        <div style="background: rgba(255,255,255,0.01); border: 1.5px solid var(--neon-orange); padding: 15px; border-radius: 4px; margin-bottom: 20px;">
+                            <span class="font-orbitron" style="font-size: 11px; color: var(--neon-orange); display: block; margin-bottom: 10px;">CORE MEMBER #1 (Captain / You)</span>
+                            <div class="form-row" style="margin-bottom:0;">
+                                <div class="form-group" style="margin-bottom:0;">
+                                    <label>Gamer Tag (Username)</label>
+                                    <input type="text" class="team-member-name" value="${user.username}" readonly disabled style="color:#888; background: rgba(0,0,0,0.2);">
+                                </div>
+                                <div class="form-group" style="margin-bottom:0;">
+                                    <label>Strikz Gamer UID</label>
+                                    <input type="text" class="team-member-strikz-uid" value="${user.uid || 'STRIKZ-XXXXXX'}" readonly disabled style="color:#888; background: rgba(0,0,0,0.2);">
+                                </div>
+                            </div>
+                            <div class="form-row" style="margin-top:10px; margin-bottom:0;">
+                                <div class="form-group" style="margin-bottom:0;">
+                                    <label>Real Name</label>
+                                    <input type="text" class="team-member-real" placeholder="Your Full Name" value="${capMember ? (capMember.real_name || capMember.realName || '') : ''}" required style="color:#fff;">
+                                </div>
+                                <div class="form-group" style="margin-bottom:0;">
+                                    <label>In-Game Name (IGN)</label>
+                                    <input type="text" class="team-member-ign" placeholder="E.g. IGL_Viper" value="${capMember ? (capMember.ign || '') : ''}" required style="color:#fff;">
+                                </div>
+                            </div>
+                            <div class="form-row" style="margin-top:10px; margin-bottom:0;">
+                                <div class="form-group" style="margin-bottom:0;">
+                                    <label>Free Fire Max UID</label>
+                                    <input type="text" class="team-member-uid" placeholder="UID-XXXXXXX" value="${capMember ? (capMember.game_uid || capMember.gameUid || '') : ''}" required style="color:#fff;">
+                                </div>
+                                <div class="form-group" style="margin-bottom:0;">
+                                    <label>Combat Roster Role</label>
+                                    <select class="team-member-role" style="color:#fff;">
+                                        <option value="IGL" ${capMember && capMember.role === 'IGL' ? 'selected' : ''}>IGL</option>
+                                        <option value="Rusher" ${capMember && capMember.role === 'Rusher' ? 'selected' : ''}>Rusher</option>
+                                        <option value="Sniper" ${capMember && capMember.role === 'Sniper' ? 'selected' : ''}>Sniper</option>
+                                        <option value="Support" ${capMember && capMember.role === 'Support' ? 'selected' : ''}>Support</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Core players 2, 3, 4 -->
+                        ${[2, 3, 4].map(num => {
+                            const mIdx = num - 1;
+                            const m = (team.members || [])[mIdx];
+                            return `
+                            <div style="background: rgba(255,255,255,0.01); border: 1px solid var(--glass-border); padding: 15px; border-radius: 4px; margin-bottom: 15px;">
+                                <span class="font-orbitron" style="font-size: 11px; color: var(--text-dim); display: block; margin-bottom: 10px;">CORE MEMBER #${num} (Invitation via UID)</span>
+                                <div class="form-row" style="margin-bottom:0; position: relative;">
+                                    <div class="form-group" style="margin-bottom:0;">
+                                        <label>Strikz Gamer UID</label>
+                                        <input type="text" class="team-member-strikz-uid search-gamer-input" placeholder="e.g. gamer_123" value="${m ? m.user_uid : ''}" style="color:#fff; text-transform: lowercase;">
+                                        <div class="autocomplete-dropdown glass-panel" style="display:none; position:absolute; z-index:100; left:0; right:0; top:64px; max-height:150px; overflow-y:auto; background:#0e0e12; border:1px solid var(--glass-border);"></div>
+                                    </div>
+                                    <div class="form-group" style="margin-bottom:0;">
+                                        <label>Combat Roster Role</label>
+                                        <select class="team-member-role" style="color:#fff;">
+                                            <option value="Rusher" ${m && m.role === 'Rusher' ? 'selected' : ''}>Rusher</option>
+                                            <option value="Sniper" ${m && m.role === 'Sniper' ? 'selected' : ''}>Sniper</option>
+                                            <option value="Support" ${m && m.role === 'Support' ? 'selected' : ''}>Support</option>
+                                            <option value="IGL" ${m && m.role === 'IGL' ? 'selected' : ''}>IGL</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-row" style="margin-top:10px; margin-bottom:0;">
+                                    <div class="form-group" style="margin-bottom:0;">
+                                        <label>Real Name</label>
+                                        <input type="text" class="team-member-real" placeholder="Player's Real Name" value="${m ? (m.real_name || m.realName || '') : ''}" style="color:#fff;">
+                                    </div>
+                                    <div class="form-group" style="margin-bottom:0;">
+                                        <label>In-Game Name (IGN)</label>
+                                        <input type="text" class="team-member-ign" placeholder="Player's IGN" value="${m ? (m.ign || '') : ''}" style="color:#fff;">
+                                    </div>
+                                </div>
+                                <div class="form-row" style="margin-top:10px; margin-bottom:0;">
+                                    <div class="form-group" style="margin-bottom:0;">
+                                        <label>Free Fire Max UID</label>
+                                        <input type="text" class="team-member-uid" placeholder="UID-XXXXXXX" value="${m ? (m.game_uid || m.gameUid || '') : ''}" style="color:#fff;">
+                                    </div>
+                                    <div class="form-group" style="margin-bottom:0;">
+                                    </div>
+                                </div>
+                            </div>
+                            `;
+                        }).join('')}
+
+                        <div style="display: flex; gap: 15px; margin-top: 20px;">
+                            <button type="submit" class="cta-button btn-neon-orange" style="flex: 1; padding: 15px;">
+                                UPDATE SQUAD DETAILS
+                            </button>
+                            <button type="button" id="btn-cancel-edit-team" class="cta-button" style="padding: 15px 30px; border: 1px solid var(--glass-border); color: #fff;">
+                                CANCEL
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+        `;
+
+        // Bind cancel button
+        const cancelBtn = document.getElementById('btn-cancel-edit-team');
+        if (cancelBtn) {
+            cancelBtn.onclick = () => {
+                if (window.strikzPlayClickSound) window.strikzPlayClickSound();
+                renderMyTeam(container);
+            };
+        }
+
+        // Bind Logo Upload trigger inside edit form
+        const logoFileInput = document.getElementById('edit-team-logo-file');
+        const uploadLogoBtn = document.getElementById('btn-upload-edit-team-logo');
+        const logoPreview = document.getElementById('edit-team-logo-preview');
+        const logoUrlInput = document.getElementById('edit-team-logo-url');
+
+        if (uploadLogoBtn && logoFileInput) {
+            uploadLogoBtn.onclick = () => logoFileInput.click();
+            logoFileInput.onchange = async function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    try {
+                        const res = await window.strikzDb.uploadFile(file);
+                        logoUrlInput.value = res.imageUrl;
+                        logoPreview.innerHTML = `<img src="${res.imageUrl}" style="width:100%; height:100%; object-fit:cover;">`;
+                        alert("Team logo uploaded successfully!");
+                    } catch (err) {
+                        alert("Failed to upload team logo: " + err.message);
+                    }
+                }
+            };
+        }
+
+        bindAutocompleteSearchInputs(form);
+
+        // Bind form submit
+        const form = document.getElementById('edit-team-form');
+        form.onsubmit = async function(e) {
+            if (e) e.preventDefault();
+            const teamName = document.getElementById('edit-team-name').value.trim().toUpperCase();
+            const teamDesc = document.getElementById('edit-team-desc').value.trim();
+            const teamLogo = logoUrlInput ? logoUrlInput.value.trim() : '';
+
+            const stUids = form.querySelectorAll('.team-member-strikz-uid');
+            const memberReals = form.querySelectorAll('.team-member-real');
+            const memberUids = form.querySelectorAll('.team-member-uid');
+            const memberRoles = form.querySelectorAll('.team-member-role');
+            const memberIgns = form.querySelectorAll('.team-member-ign');
+
+            const members = [];
+            
+            // Captain details
+            members.push({
+                user_uid: user.uid,
+                name: user.username,
+                realName: memberReals[0].value.trim(),
+                gameUid: memberUids[0].value.trim(),
+                ign: memberIgns[0].value.trim(),
+                role: memberRoles[0].value
+            });
+
+            // Invited members
+            for (let i = 1; i <= 3; i++) {
+                const uidVal = stUids[i].value.trim().toLowerCase();
+                if (uidVal) {
+                    const realVal = memberReals[i].value.trim();
+                    const ffUidVal = memberUids[i].value.trim();
+                    const roleVal = memberRoles[i].value;
+                    const ignVal = memberIgns[i].value.trim();
+
+                    if (!realVal || !ffUidVal || !ignVal) {
+                        alert(`Please fill in all details (Real Name, IGN and Free Fire UID) for Member #${i+1}.`);
+                        return;
+                    }
+
+                    members.push({
+                        user_uid: uidVal,
+                        realName: realVal,
+                        gameUid: ffUidVal,
+                        role: roleVal,
+                        ign: ignVal
+                    });
+                }
+            }
+
+            try {
+                await window.strikzDb.updateMyTeam({
+                    name: teamName,
+                    description: teamDesc,
+                    logo: teamLogo,
+                    members
+                });
+                if (window.strikzPlaySuccessSound) window.strikzPlaySuccessSound();
+                alert("Squad details updated successfully!");
+                renderMyTeam(container);
+            } catch (err) {
+                alert("Failed to update squad: " + err.message);
+            }
+        };
+
+        if (window.strikzInitScrollAnimations) window.strikzInitScrollAnimations();
+    }
+
+    if (window.strikzInitScrollAnimations) window.strikzInitScrollAnimations();
+    if (window.strikzInitSpotlightEffect) window.strikzInitSpotlightEffect();
+}
+
+// Attach to global window
+window.renderMyTeam = renderMyTeam;
     window.renderFriendsPage = renderFriendsPage;
     window.renderInboxPage = renderInboxPage;
     window.renderInboxTab = renderInboxTab;

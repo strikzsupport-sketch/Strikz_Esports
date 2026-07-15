@@ -990,6 +990,110 @@ const updateTeamLogo = async (req, res, next) => {
     }
 };
 
+const updateMyTeam = async (req, res, next) => {
+    try {
+        const { name, description, logo, members } = req.body;
+        const user = req.user;
+
+        if (!name || !description || !members || members.length === 0) {
+            res.status(400);
+            return next(new Error('Please provide team name, description and member list'));
+        }
+
+        const team = await models.Team.findOne({ captain_uid: user.uid });
+        if (!team) {
+            res.status(404);
+            return next(new Error('You do not own any active esports squad'));
+        }
+
+        const teamNameExists = await models.Team.findOne({ 
+            name: new RegExp('^' + escapeRegExp(name) + '$', 'i'),
+            id: { $ne: team.id }
+        }).lean();
+        if (teamNameExists) {
+            res.status(400);
+            return next(new Error('Team name already taken by another squad'));
+        }
+
+        team.name = name.toUpperCase();
+        team.description = description;
+        if (logo) team.logo = logo;
+        await team.save();
+
+        for (let i = 0; i < members.length; i++) {
+            const m = members[i];
+            if (i === 0) {
+                await models.TeamMember.updateOne(
+                    { team_id: team.id, user_uid: user.uid },
+                    { 
+                        $set: { 
+                            name: user.username,
+                            real_name: m.realName || user.username,
+                            game_uid: m.gameUid,
+                            role: m.role || 'IGL',
+                            confirmed: true 
+                        } 
+                    },
+                    { upsert: true }
+                );
+            } else {
+                if (!m.user_uid) continue;
+                const cleanUid = m.user_uid.trim().toLowerCase();
+                const invitee = await models.User.findOne({ uid: cleanUid }).lean();
+                if (!invitee) {
+                    res.status(400);
+                    return next(new Error(`Invalid Strikz Gamer UID: ${cleanUid}`));
+                }
+
+                const inviteeCaptain = await models.Team.findOne({ 
+                    captain_uid: invitee.uid,
+                    id: { $ne: team.id }
+                }).lean();
+                const inviteeMember = await models.TeamMember.findOne({ 
+                    user_uid: invitee.uid, 
+                    confirmed: true,
+                    team_id: { $ne: team.id }
+                }).lean();
+                if (inviteeCaptain || inviteeMember) {
+                    res.status(400);
+                    return next(new Error(`Player ${invitee.username} (${cleanUid}) is already registered in another squad`));
+                }
+
+                const existingInThisTeam = await models.TeamMember.findOne({ team_id: team.id, user_uid: invitee.uid });
+                if (existingInThisTeam) {
+                    existingInThisTeam.name = invitee.username;
+                    existingInThisTeam.real_name = m.realName;
+                    existingInThisTeam.game_uid = m.gameUid;
+                    existingInThisTeam.role = m.role;
+                    await existingInThisTeam.save();
+                } else {
+                    let nextId = await nextNumberId(models.TeamMember);
+                    await models.TeamMember.create({
+                        id: nextId,
+                        team_id: team.id,
+                        user_uid: invitee.uid,
+                        name: invitee.username,
+                        game_uid: m.gameUid,
+                        role: m.role,
+                        real_name: m.realName,
+                        confirmed: false
+                    });
+                }
+            }
+        }
+
+        const activeUids = members.map(m => m.user_uid).filter(Boolean);
+        await models.TeamMember.deleteMany({ 
+            team_id: team.id, 
+            user_uid: { $nin: activeUids } 
+        });
+
+        res.json({ success: true, message: 'Squad details updated successfully!' });
+    } catch (err) {
+        next(err);
+    }
+};
+
 module.exports = {
     getPublicSnapshot,
     trackRegistration,
@@ -1005,5 +1109,6 @@ module.exports = {
     leaveTeam,
     disbandTeam,
     kickMember,
-    updateTeamLogo
+    updateTeamLogo,
+    updateMyTeam
 };

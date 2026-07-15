@@ -15,7 +15,8 @@ const {
     leaveTeam,
     disbandTeam,
     kickMember,
-    updateTeamLogo
+    updateTeamLogo,
+    updateMyTeam
 } = require('../controllers/tournamentController');
 const { protect } = require('../middleware/authMiddleware');
 
@@ -26,6 +27,7 @@ router.get('/registrations/track/:id', trackRegistration);
 // Private User actions
 router.post('/registrations', protect, createRegistration);
 router.get('/my-team', protect, getMyTeam);
+router.put('/my-team', protect, updateMyTeam);
 router.get('/my-team/confirmations', protect, getPendingConfirmations);
 router.post('/my-team', protect, createMyTeam);
 router.post('/my-team/accept-invite', protect, acceptInvite);
