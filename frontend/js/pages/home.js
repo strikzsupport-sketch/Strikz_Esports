@@ -283,7 +283,7 @@
             <section class="sponsors-showcase">
                 <div class="sponsors-title font-orbitron">OFFICIAL PARTNERS</div>
                 <div class="sponsors-grid">
-                    ${sponsors.map(sp => {
+                    ${sponsors.filter(sp => sp.tier !== 'Ad').map(sp => {
                         let targetUrl = sp.link || sp.website || '#';
                         if (targetUrl && targetUrl !== '#' && !targetUrl.startsWith('http://') && !targetUrl.startsWith('https://')) {
                             targetUrl = 'https://' + targetUrl;
