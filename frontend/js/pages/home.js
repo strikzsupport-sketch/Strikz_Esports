@@ -294,9 +294,9 @@
                             ? `<img src="${sp.logo}" alt="${sp.name} Logo" style="max-height: 45px; max-width: 150px; object-fit: contain; filter: grayscale(1); transition: filter 0.3s;" onmouseover="this.style.filter='grayscale(0)'" onmouseout="this.style.filter='grayscale(1)'">`
                             : `<div style="font-family: var(--font-header); font-size: 16px; font-weight: 900; letter-spacing: 0.1em; color: var(--text-silver); text-shadow: 0 0 5px rgba(255,255,255,0.1); border: 1px solid var(--glass-border); padding: 8px 18px; border-radius: 4px; background: rgba(255,255,255,0.01);">${sp.logoText}</div>`;
                         return `
-                        <a href="${targetUrl}" ${targetAttr} class="sponsor-logo-box" title="${sp.name} (${sp.tier} Partner)" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; min-height: 60px; padding: 10px;">
+                        <a href="${targetUrl}" ${targetAttr} class="sponsor-logo-box" title="${sp.name} (${sp.partnerType ? sp.partnerType : (sp.tier + ' Partner')})" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; min-height: 60px; padding: 10px;">
                             ${logoHtml}
-                            ${sp.logo && sp.name ? `<span style="font-size: 10px; font-weight: 800; font-family: var(--font-header); color: var(--text-dim); letter-spacing: 0.06em; text-transform: uppercase; transition: color 0.3s;" class="sponsor-name-label">${sp.name}</span>` : ''}
+                            ${sp.logo && sp.name ? `<span style="font-size: 10px; font-weight: 800; font-family: var(--font-header); color: var(--text-dim); letter-spacing: 0.06em; text-transform: uppercase; transition: color 0.3s; display: flex; flex-direction: column; align-items: center;" class="sponsor-name-label">${sp.name} ${sp.partnerType ? `<span style="font-size: 8px; color: var(--neon-orange); font-weight: 600; margin-top: 2px;">${sp.partnerType.toUpperCase()}</span>` : ''}</span>` : ''}
                         </a>
                         `;
                     }).join('')}

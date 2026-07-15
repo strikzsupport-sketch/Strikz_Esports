@@ -162,6 +162,7 @@ const models = {
         name: { type: String },
         logo: { type: String },
         tier: { type: String },
+        partnerType: { type: String },
         website: { type: String },
         description: { type: String },
         logoText: { type: String },

@@ -1921,6 +1921,14 @@
                                     <img src="" style="max-height: 50px; border: 1px solid var(--glass-border); border-radius: 4px; object-fit: contain; background: rgba(255,255,255,0.05); padding: 4px;">
                                 </div>
                             </div>
+                            <div class="form-group">
+                                <label for="sponsor-partner-type">Partner Type Classification</label>
+                                <select id="sponsor-partner-type" style="background:#101010; border:1px solid var(--glass-border); padding:10px; color:#fff; border-radius:4px; width: 100%;">
+                                    <option value="">None (Standard Sponsor)</option>
+                                    <option value="Visual Partner">Visual Partner</option>
+                                    <option value="Production Partner">Production Partner</option>
+                                </select>
+                            </div>
                         </div>
                         <div class="form-row">
                             <div class="form-group">
@@ -1958,6 +1966,7 @@
         const nameInput = document.getElementById('sponsor-name');
         const logoTextInput = document.getElementById('sponsor-logo-text');
         const tierSelect = document.getElementById('sponsor-tier');
+        const partnerTypeSelect = document.getElementById('sponsor-partner-type');
         const promoTypeSelect = document.getElementById('sponsor-promo-type');
         const linkInput = document.getElementById('sponsor-link');
         const logoFileInput = document.getElementById('sponsor-logo-upload');
@@ -1999,7 +2008,7 @@
                     <div style="text-align: left; display: flex; align-items: center; gap: 15px;">
                         ${s.logo ? `<img src="${s.logo}" style="max-height: 40px; max-width: 60px; object-fit: contain; border-radius: 4px; background: rgba(255,255,255,0.05); padding: 2px;">` : `<div style="border: 1px dashed var(--glass-border); padding: 5px 10px; font-size: 10px; font-weight:700;">No Image</div>`}
                         <div>
-                            <span class="font-orbitron" style="font-size: 9px; color: var(--neon-yellow);">${s.tier.toUpperCase()} TIER</span>
+                            <span class="font-orbitron" style="font-size: 9px; color: var(--neon-yellow);">${s.tier.toUpperCase()} TIER ${s.partnerType ? `| ${s.partnerType.toUpperCase()}` : ''}</span>
                             <h5 class="font-orbitron" style="font-size: 13px; color: #fff; margin: 2px 0;">${s.name}</h5>
                             <p style="font-size: 11px; color: var(--text-dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 200px; margin: 0;">
                                 Type: <strong>${s.promoType}</strong> | Link: <a href="${s.link}" target="_blank" style="color: var(--neon-orange);">${s.link}</a>
@@ -2037,6 +2046,7 @@
                         nameInput.value = s.name;
                         logoTextInput.value = s.logoText;
                         tierSelect.value = s.tier;
+                        if (partnerTypeSelect) partnerTypeSelect.value = s.partnerType || '';
                         promoTypeSelect.value = s.promoType || 'Website';
                         linkInput.value = s.link;
                         logoBase64Input.value = s.logo || '';
@@ -2054,6 +2064,7 @@
                 name: nameInput.value.trim(),
                 logoText: logoTextInput.value.trim(),
                 tier: tierSelect.value,
+                partnerType: partnerTypeSelect ? partnerTypeSelect.value : '',
                 promoType: promoTypeSelect.value,
                 link: linkInput.value.trim(),
                 logo: logoBase64Input.value.trim() || ''

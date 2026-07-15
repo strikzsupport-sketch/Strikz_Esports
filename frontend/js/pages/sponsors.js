@@ -66,7 +66,7 @@
                                 <div class="font-orbitron" style="font-size: 22px; font-weight: 900; letter-spacing: 0.1em; color: #fff; min-height: 45px; display: flex; align-items: center; justify-content: center;">
                                     ${sp.logo ? `<img src="${sp.logo}" style="max-height: 45px; max-width: 180px; object-fit: contain;">` : sp.logoText}
                                 </div>
-                                <div style="font-size: 9px; color: var(--neon-yellow); letter-spacing: 0.15em; font-weight: 800; margin-top: 12px; font-family: var(--font-header);">OFFICIAL TITLE PARTNER</div>
+                                <div style="font-size: 9px; color: var(--neon-yellow); letter-spacing: 0.15em; font-weight: 800; margin-top: 12px; font-family: var(--font-header);">${sp.partnerType ? sp.partnerType.toUpperCase() : 'OFFICIAL TITLE PARTNER'}</div>
                             </div>
                         `).join('')}
                     </div>
@@ -83,7 +83,7 @@
                                 <div class="font-orbitron" style="font-size: 18px; font-weight: 800; letter-spacing: 0.08em; color: #fff; min-height: 40px; display: flex; align-items: center; justify-content: center;">
                                     ${sp.logo ? `<img src="${sp.logo}" style="max-height: 40px; max-width: 150px; object-fit: contain;">` : sp.logoText}
                                 </div>
-                                <div style="font-size: 9px; color: var(--neon-orange); letter-spacing: 0.12em; font-weight: 800; margin-top: 8px; font-family: var(--font-header);">PLATINUM SPONSOR</div>
+                                <div style="font-size: 9px; color: var(--neon-orange); letter-spacing: 0.12em; font-weight: 800; margin-top: 8px; font-family: var(--font-header);">${sp.partnerType ? sp.partnerType.toUpperCase() : 'PLATINUM SPONSOR'}</div>
                             </div>
                         `).join('')}
                     </div>
@@ -100,7 +100,7 @@
                                 <div class="font-orbitron" style="font-size: 15px; font-weight: 700; color: var(--text-silver); min-height: 35px; display: flex; align-items: center; justify-content: center;">
                                     ${sp.logo ? `<img src="${sp.logo}" style="max-height: 35px; max-width: 120px; object-fit: contain;">` : sp.logoText}
                                 </div>
-                                <div style="font-size: 8px; color: var(--text-dim); letter-spacing: 0.1em; font-weight: 700; margin-top: 6px; font-family: var(--font-header);">GOLD SPONSOR</div>
+                                <div style="font-size: 8px; color: var(--text-dim); letter-spacing: 0.1em; font-weight: 700; margin-top: 6px; font-family: var(--font-header);">${sp.partnerType ? sp.partnerType.toUpperCase() : 'GOLD SPONSOR'}</div>
                             </div>
                         `).join('')}
                     </div>
