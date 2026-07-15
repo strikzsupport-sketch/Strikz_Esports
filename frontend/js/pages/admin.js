@@ -1909,6 +1909,7 @@
                                     <option value="Title">Title Partner</option>
                                     <option value="Platinum">Platinum Sponsor</option>
                                     <option value="Gold">Gold Sponsor</option>
+                                    <option value="Ad">Ad Sponsor</option>
                                 </select>
                             </div>
                         </div>

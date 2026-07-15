@@ -13,7 +13,7 @@
         const goldSponsors = sponsors.filter(s => s.tier === 'Gold');
 
         // Sponsored Channels / Promotions
-        const sponsoredPromos = sponsors.filter(s => s.link && s.link !== '#');
+        const sponsoredPromos = sponsors.filter(s => s.tier === 'Ad');
 
         container.innerHTML = `
             <!-- Page Header -->
@@ -31,7 +31,7 @@
             <!-- Featured Brand Promotions (Admin promoted channels/links) -->
             ${sponsoredPromos.length > 0 ? `
             <section class="container bg-section-black reveal" style="margin-bottom: 60px;">
-                <h3 class="font-orbitron text-center" style="font-size: 16px; color: var(--neon-yellow); letter-spacing: 0.15em; margin-bottom: 25px;"><i class="fa-solid fa-rectangle-ad"></i> FEATURED BRAND PROMOTIONS</h3>
+                <h3 class="font-orbitron text-center" style="font-size: 16px; color: var(--neon-yellow); letter-spacing: 0.15em; margin-bottom: 25px;"><i class="fa-solid fa-rectangle-ad"></i> AD SPONSORS</h3>
                 
                 <div class="grid-3" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
                     ${sponsoredPromos.map(sp => `
@@ -42,11 +42,11 @@
                                 </span>
                                 <h4 class="font-orbitron" style="font-size: 18px; color: #fff; margin-top: 15px; margin-bottom: 8px;">${sp.name}</h4>
                                 <p style="font-size: 12px; color: var(--text-silver); line-height: 1.5; margin-bottom: 20px;">
-                                    Visit the official channel and support our primary esports partner. Discover exclusive giveaways and merchandise discount links!
+                                    ${sp.description || 'Visit our official brand partner for exclusive details, products, and community events!'}
                                 </p>
                             </div>
                             <a href="${sp.link}" target="_blank" class="cta-button btn-neon-orange text-center font-orbitron" style="display: block; padding: 10px 0; font-size: 11px; font-weight: 900;">
-                                <i class="fa-brands fa-youtube"></i> WATCH & SUBSCRIBE
+                                <i class="fa-solid fa-arrow-up-right-from-square"></i> CLICK HERE
                             </a>
                         </div>
                     `).join('')}
