@@ -369,7 +369,12 @@ const connectDB = async () => {
                     uid = `${base}_${randomNum}`;
                     exists = await models.User.exists({ uid });
                 }
+                const oldUid = user.uid;
                 await models.User.updateOne({ id: user.id }, { $set: { uid } });
+                if (oldUid) {
+                    await models.Team.updateMany({ captain_uid: oldUid }, { $set: { captain_uid: uid } });
+                    await models.TeamMember.updateMany({ user_uid: oldUid }, { $set: { user_uid: uid } });
+                }
             }
             console.log('User gamer UIDs migration complete.');
         }
