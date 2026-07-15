@@ -1147,6 +1147,7 @@
                     </div>
                 </section>
             `;
+            const btn = document.getElementById('btn-friends-login-trigger');
             if (btn) {
                 btn.onclick = function() {
                     if (window.strikzPlayClickSound) window.strikzPlayClickSound();
@@ -1196,6 +1197,7 @@
                     </div>
                 </section>
             `;
+            const btn = document.getElementById('btn-inbox-login-trigger');
             if (btn) {
                 btn.onclick = function() {
                     if (window.strikzPlayClickSound) window.strikzPlayClickSound();
@@ -1541,12 +1543,8 @@
         if (window.strikzInitScrollAnimations) window.strikzInitScrollAnimations();
     }
 
-    if (window.strikzInitScrollAnimations) window.strikzInitScrollAnimations();
-    if (window.strikzInitSpotlightEffect) window.strikzInitSpotlightEffect();
-}
-
-// Attach to global window
-window.renderMyTeam = renderMyTeam;
+    // Attach to global window
+    window.renderMyTeam = renderMyTeam;
     window.renderFriendsPage = renderFriendsPage;
     window.renderInboxPage = renderInboxPage;
     window.renderInboxTab = renderInboxTab;
