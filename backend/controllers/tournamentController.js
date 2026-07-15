@@ -385,9 +385,27 @@ const getMyTeam = async (req, res, next) => {
         const populatedMembers = [];
         for (const m of members) {
             const u = await models.User.findOne({ uid: m.user_uid }).select('avatar').lean();
+            
+            let fallbackGameUid = m.game_uid;
+            let fallbackRealName = m.real_name;
+            let fallbackName = m.name;
+            
+            if (!fallbackGameUid || !fallbackRealName) {
+                // Look up their details in past registration records as a fallback
+                const pastReg = await models.RegistrationPlayer.findOne({ user_uid: m.user_uid }).lean();
+                if (pastReg) {
+                    if (!fallbackGameUid) fallbackGameUid = pastReg.game_uid;
+                    if (!fallbackRealName) fallbackRealName = pastReg.real_name;
+                    if (!fallbackName) fallbackName = pastReg.name;
+                }
+            }
+
             populatedMembers.push({
                 ...m,
-                avatar: u ? u.avatar : `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(m.name)}`
+                name: fallbackName || m.name || (u ? u.username : ''),
+                real_name: fallbackRealName || m.real_name || (u ? u.username : ''),
+                game_uid: fallbackGameUid || m.game_uid || '',
+                avatar: u ? u.avatar : `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(fallbackName || m.name || '')}`
             });
         }
         res.json({

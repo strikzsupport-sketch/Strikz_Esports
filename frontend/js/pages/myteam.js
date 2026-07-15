@@ -962,10 +962,14 @@
                         </div>
                         <div class="form-group" style="margin-bottom:0;">
                             <label>Combat Roster Role</label>
-                            <input type="text" value="IGL" readonly disabled style="color:#888; background: rgba(0,0,0,0.2);">
+                            <select class="team-member-role" style="color:#fff;">
+                                <option value="IGL">IGL</option>
+                                <option value="Rusher">Rusher</option>
+                                <option value="Sniper">Sniper</option>
+                                <option value="Support">Support</option>
+                            </select>
                         </div>
                     </div>
-                    <input type="hidden" class="team-member-role" value="IGL">
                 </div>
 
                 <!-- core players 2, 3, 4 -->
@@ -1126,7 +1130,7 @@
                 realName: memberReals[0].value.trim(),
                 gameUid: memberUids[0].value.trim(),
                 ign: memberIgns[0].value.trim(),
-                role: 'IGL'
+                role: memberRoles[0].value
             });
 
             // Invited members
