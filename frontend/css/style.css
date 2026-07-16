@@ -4971,3 +4971,17 @@ button, input, select, textarea {
     box-shadow: 0 0 10px rgba(0, 242, 254, 0.3);
 }
 
+.account-grid {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 30px;
+    align-items: start;
+}
+
+@media (max-width: 768px) {
+    .account-grid {
+        grid-template-columns: 1fr !important;
+        gap: 20px !important;
+    }
+}
+

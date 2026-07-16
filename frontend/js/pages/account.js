@@ -55,7 +55,7 @@
                     <div class="section-divider"></div>
                 </div>
 
-                <div class="grid-2" style="grid-template-columns: 1fr 2fr; gap: 30px; align-items: start;">
+                <div class="account-grid">
                     <!-- LEFT COLUMN: Profile summary -->
                     <div class="glass-panel text-center" style="padding: 30px 20px; border-color: var(--neon-cyan-border); box-shadow: 0 0 15px rgba(0, 240, 255, 0.03);">
                         <div style="position: relative; width: 100px; height: 100px; margin: 0 auto 20px auto; border-radius: 50%; overflow: hidden; border: 2.5px solid var(--neon-cyan); background: rgba(0,0,0,0.4);">
@@ -115,6 +115,12 @@
                                 </div>
                             </div>
 
+                            <div class="form-group">
+                                <label>Upload Profile Photo from Device</label>
+                                <input type="file" id="account-avatar-file-input" accept="image/*" style="background: rgba(255,255,255,0.02); border: 1px solid var(--glass-border); padding: 10px; border-radius: 6px; color:#fff; font-size: 11px; width: 100%;">
+                                <span id="account-upload-status" style="font-size: 9.5px; color: var(--text-dim); margin-top: 6px; display: block; line-height: 1.3;">Choose a photo from your device (JPEG, PNG).</span>
+                            </div>
+
                             <input type="hidden" id="account-input-avatar-url" value="${user.avatar || ''}">
 
                             <button type="submit" class="cta-button btn-neon-orange w-full" style="padding: 15px; margin-top: 10px; font-weight: 800;">
@@ -141,6 +147,53 @@
                 avatarPreview.src = selectedAvatar;
             };
         });
+
+        // Handle Avatar File Upload from Device
+        const avatarFileInput = document.getElementById('account-avatar-file-input');
+        const uploadStatusSpan = document.getElementById('account-upload-status');
+
+        if (avatarFileInput) {
+            avatarFileInput.onchange = async function() {
+                const file = avatarFileInput.files[0];
+                if (!file) return;
+
+                if (file.size > 5 * 1024 * 1024) {
+                    alert("Please select an image smaller than 5MB.");
+                    avatarFileInput.value = '';
+                    return;
+                }
+
+                try {
+                    if (uploadStatusSpan) {
+                        uploadStatusSpan.textContent = "Uploading image to terminal... Please wait.";
+                        uploadStatusSpan.style.color = "var(--neon-orange)";
+                    }
+
+                    const res = await window.strikzDb.uploadFile(file);
+                    
+                    if (res && res.imageUrl) {
+                        customAvatarInput.value = res.imageUrl;
+                        avatarPreview.src = res.imageUrl;
+                        
+                        avatarOptions.forEach(o => o.style.borderColor = 'transparent');
+
+                        if (uploadStatusSpan) {
+                            uploadStatusSpan.textContent = "Image uploaded successfully! Click Save to apply.";
+                            uploadStatusSpan.style.color = "var(--neon-green)";
+                        }
+                        if (window.strikzPlaySuccessSound) window.strikzPlaySuccessSound();
+                    } else {
+                        throw new Error("Invalid response format");
+                    }
+                } catch (err) {
+                    if (uploadStatusSpan) {
+                        uploadStatusSpan.textContent = "Upload failed: " + err.message;
+                        uploadStatusSpan.style.color = "#ff5f5f";
+                    }
+                    alert("Profile photo upload failed: " + err.message);
+                }
+            };
+        }
 
         // Copy UID handler
         const copyUidBtn = document.getElementById('btn-account-copy-uid');

@@ -574,15 +574,15 @@
             const safeName = escapeHtml(name);
             const safeUid = escapeHtml(uid || '');
             return `
-            <div class="user-profile-card" style="cursor: pointer;" onclick="window.location.hash = '#/account'" title="My Account Settings">
-                <img src="${safeAvatar}" alt="Avatar for ${safeName}" class="user-avatar-small" style="border-color: var(--neon-cyan); width: 36px; height: 36px; border-radius: 50%; object-fit: cover;">
-                <div class="user-info-text" style="align-items: center; width: 100%; margin-top: 4px;">
-                    <div class="user-gamertag" style="font-weight: 700; color: #fff; font-size: 10px; max-width: 85px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: center;">${safeName}</div>
-                    <div style="color: var(--neon-yellow); font-size: 8.5px; font-weight: bold; font-family: var(--font-header); letter-spacing:0.02em; margin-top: 1px; text-align: center;">
+            <div class="user-profile-card btn-desktop-settings-trigger" style="cursor: pointer;" title="My Account Settings">
+                <img src="${safeAvatar}" alt="Avatar for ${safeName}" class="user-avatar-small btn-desktop-settings-trigger" style="border-color: var(--neon-cyan); width: 36px; height: 36px; border-radius: 50%; object-fit: cover;">
+                <div class="user-info-text btn-desktop-settings-trigger" style="align-items: center; width: 100%; margin-top: 4px;">
+                    <div class="user-gamertag btn-desktop-settings-trigger" style="font-weight: 700; color: #fff; font-size: 10px; max-width: 85px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: center;">${safeName}</div>
+                    <div style="color: var(--neon-yellow); font-size: 8.5px; font-weight: bold; font-family: var(--font-header); letter-spacing:0.02em; margin-top: 1px; text-align: center;" class="btn-desktop-settings-trigger">
                         ${safeUid || 'STRIKZ-XXXXXX'}
                     </div>
                 </div>
-                <div style="margin-top: 8px; font-size: 9px; font-family: var(--font-header); font-weight: 800; color: var(--neon-cyan); text-transform: uppercase; border: 1px solid var(--neon-cyan-border); padding: 4px 8px; border-radius: 4px; background: rgba(0, 242, 254, 0.04); letter-spacing: 0.05em; display: flex; align-items: center; gap: 4px;"><i class="fa-solid fa-user-gear" style="font-size: 10px; color: var(--neon-cyan);"></i> Profile</div>
+                <div class="btn-desktop-settings-trigger" style="margin-top: 8px; font-size: 9px; font-family: var(--font-header); font-weight: 800; color: var(--neon-cyan); text-transform: uppercase; border: 1px solid var(--neon-cyan-border); padding: 4px 8px; border-radius: 4px; background: rgba(0, 242, 254, 0.04); letter-spacing: 0.05em; display: flex; align-items: center; gap: 4px;"><i class="fa-solid fa-user-gear btn-desktop-settings-trigger" style="font-size: 10px; color: var(--neon-cyan);"></i> Profile</div>
             </div>
         `;
         };
@@ -591,9 +591,9 @@
             const safeAvatar = escapeHtml(avatar);
             const safeName = escapeHtml(name);
             return `
-            <div class="user-profile-card-mobile" style="cursor: pointer; padding: 4px 10px; background: rgba(255,255,255,0.02); border: 1.5px solid var(--neon-cyan-border); border-radius: 20px; display: flex; align-items: center; gap: 8px;" onclick="window.location.hash = '#/account'" title="My Account Settings">
-                <img src="${safeAvatar}" alt="Avatar for ${safeName}" class="user-avatar-small-mobile" style="width: 20px; height: 20px; border-radius: 50%; object-fit: cover;">
-                <span style="font-size: 11px; font-weight: 800; color: #fff; font-family: var(--font-header); text-transform: uppercase;">${safeName}</span>
+            <div class="user-profile-card-mobile btn-mobile-settings-trigger" style="cursor: pointer; padding: 4px 10px; background: rgba(255,255,255,0.02); border: 1.5px solid var(--neon-cyan-border); border-radius: 20px; display: flex; align-items: center; gap: 8px;" title="My Account Settings">
+                <img src="${safeAvatar}" alt="Avatar for ${safeName}" class="user-avatar-small-mobile btn-mobile-settings-trigger" style="width: 20px; height: 20px; border-radius: 50%; object-fit: cover;">
+                <span style="font-size: 11px; font-weight: 800; color: #fff; font-family: var(--font-header); text-transform: uppercase;" class="btn-mobile-settings-trigger">${safeName}</span>
             </div>
         `;
         };
