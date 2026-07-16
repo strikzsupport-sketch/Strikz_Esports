@@ -131,6 +131,7 @@
         '/about': window.renderAbout,
         '/team': window.renderTeam,
         '/myteam': window.renderMyTeam,
+        '/account': window.renderAccountPage,
         '/friends': window.renderFriendsPage,
         '/inbox': window.renderInboxPage,
         '/history': window.renderHistory,
@@ -573,21 +574,13 @@
             const safeName = escapeHtml(name);
             const safeUid = escapeHtml(uid || '');
             return `
-            <div class="user-profile-card">
-                <img src="${safeAvatar}" alt="Avatar for ${safeName}" class="user-avatar-small btn-desktop-settings-trigger" style="cursor: pointer;" title="Account Settings">
-                <div class="user-info-text" style="cursor: pointer;">
-                    <div class="user-gamertag btn-desktop-settings-trigger" title="Account Settings">${safeName}</div>
-                    <div class="user-status-text click-to-copy-uid" style="color: var(--neon-yellow); font-size: 10px; font-weight: bold; font-family: var(--font-header); letter-spacing:0.05em; display:flex; align-items:center; gap:4px; margin-top:2px;" title="Click to copy Gamer UID" data-uid="${safeUid}">
-                        <i class="fa-regular fa-copy" aria-hidden="true" style="font-size:9px;"></i> ${safeUid || 'STRIKZ-XXXXXX'}
+            <div class="user-profile-card" style="cursor: pointer;" onclick="window.location.hash = '#/account'" title="My Account Settings">
+                <img src="${safeAvatar}" alt="Avatar for ${safeName}" class="user-avatar-small" style="border-color: var(--neon-cyan); width: 36px; height: 36px; border-radius: 50%; object-fit: cover;">
+                <div class="user-info-text" style="align-items: center; width: 100%; margin-top: 4px;">
+                    <div class="user-gamertag" style="font-weight: 700; color: #fff; font-size: 10px; max-width: 85px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: center;">${safeName}</div>
+                    <div style="color: var(--neon-yellow); font-size: 8.5px; font-weight: bold; font-family: var(--font-header); letter-spacing:0.02em; margin-top: 1px; text-align: center;">
+                        ${safeUid || 'STRIKZ-XXXXXX'}
                     </div>
-                </div>
-                <div style="display: flex; gap: 8px; justify-content: center; margin-top: 10px; border-top: 1px solid var(--glass-border); padding-top: 8px; width: 100%;">
-                    <button class="btn-auth-settings btn-desktop-settings-trigger" aria-label="Account Settings" style="color: var(--text-dim); background: none; border: none; cursor: pointer; font-size: 11px;">
-                        <i class="fa-solid fa-user-gear" aria-hidden="true"></i> Settings
-                    </button>
-                    <button class="btn-auth-logout btn-desktop-logout-trigger" aria-label="Log out" style="color: var(--text-dim); background: none; border: none; cursor: pointer; font-size: 11px; margin-left: 10px;">
-                        <i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i> Logout
-                    </button>
                 </div>
             </div>
         `;
@@ -596,29 +589,10 @@
         const mobileLoggedInHTML = (avatar, name, uid) => {
             const safeAvatar = escapeHtml(avatar);
             const safeName = escapeHtml(name);
-            const safeUid = escapeHtml(uid || '');
             return `
-            <div class="user-profile-card-mobile">
-                <img src="${safeAvatar}" alt="Avatar for ${safeName}" class="user-avatar-small-mobile btn-mobile-settings-trigger" style="cursor: pointer;" title="Account Settings">
-                <div class="user-info-text-mobile" style="cursor: pointer;">
-                    <div class="user-gamertag-mobile font-orbitron btn-mobile-settings-trigger" title="Account Settings">${safeName}</div>
-                    <div class="user-status-text-mobile click-to-copy-uid" style="color: var(--neon-yellow); font-size: 9px; font-weight: bold; font-family: var(--font-header); letter-spacing:0.05em; display:flex; align-items:center; gap:4px; margin-top:2px;" title="Click to copy Gamer UID" data-uid="${safeUid}">
-                        <i class="fa-regular fa-copy" aria-hidden="true" style="font-size:8px;"></i> ${safeUid || 'STRIKZ-XXXXXX'}
-                    </div>
-                </div>
-                <div class="profile-menu-container-mobile">
-                    <button class="btn-auth-logout-mobile" id="btn-mobile-menu-trigger" aria-label="Account options" aria-haspopup="true" aria-expanded="false">
-                        <i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i>
-                    </button>
-                    <div class="profile-dropdown-menu-mobile glass-panel hidden" role="menu">
-                        <button class="dropdown-item-mobile btn-mobile-settings-trigger" role="menuitem">
-                            <i class="fa-solid fa-user-gear" aria-hidden="true"></i> Settings
-                        </button>
-                        <button class="dropdown-item-mobile btn-mobile-logout-trigger" role="menuitem">
-                            <i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i> Logout
-                        </button>
-                    </div>
-                </div>
+            <div class="user-profile-card-mobile" style="cursor: pointer; padding: 4px 10px; background: rgba(255,255,255,0.02); border: 1.5px solid var(--neon-cyan-border); border-radius: 20px; display: flex; align-items: center; gap: 8px;" onclick="window.location.hash = '#/account'" title="My Account Settings">
+                <img src="${safeAvatar}" alt="Avatar for ${safeName}" class="user-avatar-small-mobile" style="width: 20px; height: 20px; border-radius: 50%; object-fit: cover;">
+                <span style="font-size: 11px; font-weight: 800; color: #fff; font-family: var(--font-header); text-transform: uppercase;">${safeName}</span>
             </div>
         `;
         };
@@ -637,6 +611,12 @@
             if (mobileSlot) mobileSlot.innerHTML = mobileLoggedInHTML(user.avatar, user.username, user.uid);
             
             document.body.classList.add('logged-in');
+
+            // Show My Account links
+            const navAccount = document.getElementById('li-nav-account');
+            const mobAccount = document.getElementById('mob-account');
+            if (navAccount) navAccount.style.display = 'block';
+            if (mobAccount) mobAccount.style.display = 'flex';
 
             if (quickPortal) {
                 quickPortal.innerHTML = `
@@ -735,6 +715,12 @@
             });
         } else {
             document.body.classList.remove('logged-in');
+
+            // Hide My Account links
+            const navAccount = document.getElementById('li-nav-account');
+            const mobAccount = document.getElementById('mob-account');
+            if (navAccount) navAccount.style.display = 'none';
+            if (mobAccount) mobAccount.style.display = 'none';
             if (quickPortal) {
                 quickPortal.classList.add('hidden');
                 quickPortal.innerHTML = '';
@@ -1107,21 +1093,7 @@
     window.strikzCloseLoginModal = closeLoginModal;
 
     function openSettingsModal() {
-        if (!settingsModal) return;
-        const user = authManager.getUser();
-        if (user && settingsUserInput) {
-            settingsUserInput.value = user.username;
-            const settingsInputAvatar = document.getElementById('settings-input-avatar');
-            if (settingsInputAvatar) settingsInputAvatar.value = user.avatar;
-            const settingsAvatarPreview = document.getElementById('settings-avatar-preview');
-            if (settingsAvatarPreview) settingsAvatarPreview.src = user.avatar;
-        }
-        settingsModal.classList.add('active');
-
-        // Accessibility: trap focus inside modal
-        trapFocus(settingsModal);
-        settingsModal._escHandler = (e) => { if (e.key === 'Escape') closeSettingsModal(); };
-        document.addEventListener('keydown', settingsModal._escHandler);
+        window.location.hash = '#/account';
     }
 
     function closeSettingsModal() {
