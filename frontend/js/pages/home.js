@@ -232,7 +232,7 @@
             </section>
 
             <!-- Subscription Shop Showcase Section -->
-            \${activeProducts.length > 0 ? \`
+            ${activeProducts.length > 0 ? `
             <section class="container reveal" style="margin-bottom: 80px;">
                 <div class="section-header">
                     <span class="section-subtitle">STORE DEALS</span>
@@ -241,60 +241,60 @@
                 </div>
 
                 <!-- Featured Products Grid -->
-                \${featuredProducts.length > 0 ? \`
+                ${featuredProducts.length > 0 ? `
                     <div style="margin-bottom: 40px;">
                         <h3 class="font-orbitron" style="font-size: 13px; color: var(--neon-cyan); margin-bottom: 20px; display: flex; align-items: center; gap: 8px; font-weight: 800; border-bottom: 1px solid var(--glass-border); padding-bottom: 8px; text-transform: uppercase;">
                             <i class="fa-solid fa-star"></i> FEATURED SUBSCRIPTIONS
                         </h3>
                         <div class="grid-4" style="gap: 20px;">
-                            \${featuredProducts.map(p => \`
+                            ${featuredProducts.map(p => `
                                 <div class="glass-panel text-center" style="padding: 15px; border-color: rgba(0, 240, 255, 0.1); background: rgba(0,0,0,0.25); display: flex; flex-direction: column; justify-content: space-between; min-height: 250px; position: relative;">
-                                    \${p.badge && p.badge !== 'none' ? \`
-                                        <span class="badge-status status-approved font-orbitron" style="position: absolute; top: 10px; left: 10px; font-size: 7.5px; padding: 2px 6px;">\${p.badge}</span>
-                                    \` : ''}
+                                    ${p.badge && p.badge !== 'none' ? `
+                                        <span class="badge-status status-approved font-orbitron" style="position: absolute; top: 10px; left: 10px; font-size: 7.5px; padding: 2px 6px;">${p.badge}</span>
+                                    ` : ''}
                                     <div>
-                                        <img src="\${p.image || 'assets/coming_soon.png'}" style="width: 44px; height: 44px; object-fit: contain; margin: 10px auto; display: block; border-radius: 6px; background: rgba(0,0,0,0.3); padding: 3px; border: 1px solid var(--glass-border);">
-                                        <h5 class="font-orbitron" style="font-size: 12px; color: #fff; margin: 8px 0 4px 0; text-transform: uppercase;">\${p.name}</h5>
-                                        <p style="font-size: 10.5px; color: var(--text-silver); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.4; margin-bottom: 10px;">\${p.description || 'Premium plan'}</p>
+                                        <img src="${p.image || 'assets/coming_soon.png'}" style="width: 44px; height: 44px; object-fit: contain; margin: 10px auto; display: block; border-radius: 6px; background: rgba(0,0,0,0.3); padding: 3px; border: 1px solid var(--glass-border);">
+                                        <h5 class="font-orbitron" style="font-size: 12px; color: #fff; margin: 8px 0 4px 0; text-transform: uppercase;">${p.name}</h5>
+                                        <p style="font-size: 10.5px; color: var(--text-silver); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.4; margin-bottom: 10px;">${p.description || 'Premium plan'}</p>
                                     </div>
                                     <div>
-                                        <div style="font-size: 12px; color: var(--neon-yellow); font-family: var(--font-header); font-weight: bold; margin-bottom: 10px;">INR \${p.discountedPrice || p.price}</div>
-                                        <a href="#/shop?product=\${p.id}" class="cta-button btn-neon-cyan w-full" style="padding: 6px 8px; font-size: 9.5px; font-weight: 800;" onclick="if(window.strikzPlayClickSound) window.strikzPlayClickSound();">BUY NOW</a>
+                                        <div style="font-size: 12px; color: var(--neon-yellow); font-family: var(--font-header); font-weight: bold; margin-bottom: 10px;">INR ${p.discountedPrice || p.price}</div>
+                                        <a href="#/shop?product=${p.id}" class="cta-button btn-neon-cyan w-full" style="padding: 6px 8px; font-size: 9.5px; font-weight: 800;" onclick="if(window.strikzPlayClickSound) window.strikzPlayClickSound();">BUY NOW</a>
                                     </div>
                                 </div>
-                            \`).join('')}
+                            `).join('')}
                         </div>
                     </div>
-                \` : ''}
+                ` : ''}
 
                 <!-- Best Deals & Category Highlights Grid -->
                 <div class="account-grid" style="display: grid; grid-template-columns: 1fr 1.2fr; gap: 30px; align-items: start;">
                     
                     <!-- Left: Best Deals -->
-                    \${bestDeals.length > 0 ? \`
+                    ${bestDeals.length > 0 ? `
                         <div class="glass-panel" style="padding: 25px; border-color: rgba(255,255,255,0.03); background: rgba(0,0,0,0.15);">
                             <h3 class="font-orbitron" style="font-size: 13px; color: var(--neon-orange); margin-bottom: 20px; font-weight: 800; border-bottom: 1px solid var(--glass-border); padding-bottom: 8px; text-transform: uppercase;">
                                 <i class="fa-solid fa-fire"></i> BEST DISCOUNT DEALS
                             </h3>
                             <div style="display: flex; flex-direction: column; gap: 12px;">
-                                \${bestDeals.map(p => \`
-                                    <a href="#/shop?product=\${p.id}" class="glass-panel" style="padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; gap: 15px; text-decoration: none; background: rgba(0,0,0,0.3); transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='none'" onclick="if(window.strikzPlayClickSound) window.strikzPlayClickSound();">
+                                ${bestDeals.map(p => `
+                                    <a href="#/shop?product=${p.id}" class="glass-panel" style="padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; gap: 15px; text-decoration: none; background: rgba(0,0,0,0.3); transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='none'" onclick="if(window.strikzPlayClickSound) window.strikzPlayClickSound();">
                                         <div style="display: flex; align-items: center; gap: 12px; text-align: left;">
-                                            <img src="\${p.image || 'assets/coming_soon.png'}" style="width: 36px; height: 36px; object-fit: contain; border-radius: 4px; border: 1px solid var(--glass-border); padding: 2px; background: rgba(0,0,0,0.3);">
+                                            <img src="${p.image || 'assets/coming_soon.png'}" style="width: 36px; height: 36px; object-fit: contain; border-radius: 4px; border: 1px solid var(--glass-border); padding: 2px; background: rgba(0,0,0,0.3);">
                                             <div>
-                                                <h5 class="font-orbitron" style="font-size: 12px; color: #fff; margin: 0; text-transform: uppercase;">\${p.name}</h5>
-                                                <span style="font-size: 9px; color: var(--text-dim); text-transform: uppercase;">\${p.category}</span>
+                                                <h5 class="font-orbitron" style="font-size: 12px; color: #fff; margin: 0; text-transform: uppercase;">${p.name}</h5>
+                                                <span style="font-size: 9px; color: var(--text-dim); text-transform: uppercase;">${p.category}</span>
                                             </div>
                                         </div>
                                         <div style="text-align: right;">
-                                            <div style="font-size: 12px; color: var(--neon-yellow); font-family: var(--font-header); font-weight: bold;">INR \${p.discountedPrice}</div>
-                                            <span class="badge-status status-approved font-orbitron" style="font-size: 7.5px; font-weight: 800; padding: 1px 4px; color: var(--neon-green); border-color: rgba(34,197,94,0.25); background: none;">\${getSavingsPercent(p)}% OFF</span>
+                                            <div style="font-size: 12px; color: var(--neon-yellow); font-family: var(--font-header); font-weight: bold;">INR ${p.discountedPrice}</div>
+                                            <span class="badge-status status-approved font-orbitron" style="font-size: 7.5px; font-weight: 800; padding: 1px 4px; color: var(--neon-green); border-color: rgba(34,197,94,0.25); background: none;">${getSavingsPercent(p)}% OFF</span>
                                         </div>
                                     </a>
-                                \`).join('')}
+                                `).join('')}
                             </div>
                         </div>
-                    \` : ''}
+                    ` : ''}
 
                     <!-- Right: Popular Tabs Switcher -->
                     <div class="glass-panel" style="padding: 25px; border-color: rgba(255,255,255,0.03); background: rgba(0,0,0,0.15);">
@@ -324,7 +324,7 @@
                     </a>
                 </div>
             </section>
-            \` : ''}
+            ` : ''}
 
             <!-- Social Media Feed Section -->
             <section class="container reveal" style="margin-bottom: 80px;">
