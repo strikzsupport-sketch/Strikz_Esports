@@ -532,7 +532,8 @@
                                             <span class="message-time"><i class="fa-solid fa-clock"></i> ${window.strikzFormatDate(item.date)}</span>
                                         </div>
                                     </div>
-                                    <div style="display: flex; gap: 10px; align-self: center;">
+                                    <div style="display: flex; gap: 10px; align-self: center; flex-wrap: wrap; justify-content: flex-end;">
+                                        ${!item.read ? `<button class="cta-button btn-inbox-mark-read" data-id="${item.id}" style="padding: 8px 12px; font-size: 11px; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: #fff; display: inline-flex; align-items: center; gap: 4px;"><i class="fa-solid fa-check"></i> MARK AS READ</button>` : ''}
                                         <button class="cta-button btn-neon-yellow btn-inbox-accept-invite" data-team-id="${item.metadata.teamId}" style="padding: 8px 16px; font-size: 11px; font-weight:800; color:#000 !important;">
                                             ACCEPT
                                         </button>
@@ -559,7 +560,8 @@
                                             <span class="message-time"><i class="fa-solid fa-clock"></i> ${window.strikzFormatDate(item.date)}</span>
                                         </div>
                                     </div>
-                                    <div style="align-self: center;">
+                                    <div style="display: flex; gap: 10px; align-self: center; flex-wrap: wrap; justify-content: flex-end;">
+                                        ${!item.read ? `<button class="cta-button btn-inbox-mark-read" data-id="${item.id}" style="padding: 8px 12px; font-size: 11px; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: #fff; display: inline-flex; align-items: center; gap: 4px;"><i class="fa-solid fa-check"></i> MARK AS READ</button>` : ''}
                                         <button class="cta-button btn-neon-yellow btn-inbox-confirm-join" data-reg-id="${item.metadata.regId}" style="padding: 8px 16px; font-size: 11px; font-weight:800; color:#000 !important; white-space:nowrap;">
                                             CONFIRM JOIN
                                         </button>
@@ -588,7 +590,8 @@
                                             <i class="fa-solid fa-trash-can"></i>
                                         </button>
                                     </div>
-                                    <div style="margin-top: 15px; display: flex; justify-content: flex-end;">
+                                    <div style="margin-top: 15px; display: flex; justify-content: flex-end; gap: 10px; flex-wrap: wrap;">
+                                        ${!item.read ? `<button class="cta-button btn-inbox-mark-read" data-id="${item.id}" style="padding: 8px 16px; font-size: 11px; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: #fff; display: inline-flex; align-items: center; gap: 4px;"><i class="fa-solid fa-check"></i> MARK AS READ</button>` : ''}
                                         <a href="${parsed.link}" target="_blank" class="cta-button btn-neon-green btn-whatsapp-join" data-id="${item.id}" style="padding: 8px 16px; font-size: 11px; display: inline-flex; align-items: center; gap: 6px; text-decoration: none;">
                                             <i class="fa-brands fa-whatsapp"></i> JOIN WHATSAPP GROUP
                                         </a>
@@ -627,6 +630,7 @@
                                         </button>
                                     </div>
                                     <div style="margin-top: 15px; display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap;">
+                                        ${!item.read ? `<button class="cta-button btn-inbox-mark-read" data-id="${item.id}" style="padding: 6px 12px; font-size: 10px; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: #fff; display: inline-flex; align-items: center; gap: 4px;"><i class="fa-solid fa-check"></i> MARK AS READ</button>` : ''}
                                         <button class="cta-button btn-copy-action btn-copy-room" data-room="${parsed.roomId}" data-id="${item.id}" style="padding: 6px 12px; font-size: 10px;">
                                             <i class="fa-solid fa-copy"></i> COPY ROOM ID
                                         </button>
@@ -665,6 +669,11 @@
                                             <i class="fa-solid fa-trash-can"></i>
                                         </button>
                                     </div>
+                                    ${!item.read ? `
+                                    <div style="margin-top: 15px; display: flex; justify-content: flex-end;">
+                                        <button class="cta-button btn-inbox-mark-read" data-id="${item.id}" style="padding: 8px 16px; font-size: 11px; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: #fff; display: inline-flex; align-items: center; gap: 4px;"><i class="fa-solid fa-check"></i> MARK AS READ</button>
+                                    </div>
+                                    ` : ''}
                                 </div>
                             `;
                         } else if (parsed.type === 'announcement') {
@@ -686,6 +695,11 @@
                                             <i class="fa-solid fa-trash-can"></i>
                                         </button>
                                     </div>
+                                    ${!item.read ? `
+                                    <div style="margin-top: 15px; display: flex; justify-content: flex-end;">
+                                        <button class="cta-button btn-inbox-mark-read" data-id="${item.id}" style="padding: 8px 16px; font-size: 11px; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: #fff; display: inline-flex; align-items: center; gap: 4px;"><i class="fa-solid fa-check"></i> MARK AS READ</button>
+                                    </div>
+                                    ` : ''}
                                 </div>
                             `;
                         } else {
@@ -707,6 +721,11 @@
                                             <i class="fa-solid fa-trash-can"></i>
                                         </button>
                                     </div>
+                                    ${!item.read ? `
+                                    <div style="margin-top: 15px; display: flex; justify-content: flex-end;">
+                                        <button class="cta-button btn-inbox-mark-read" data-id="${item.id}" style="padding: 8px 16px; font-size: 11px; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: #fff; display: inline-flex; align-items: center; gap: 4px;"><i class="fa-solid fa-check"></i> MARK AS READ</button>
+                                    </div>
+                                    ` : ''}
                                 </div>
                             `;
                         }
@@ -806,35 +825,32 @@
             };
         });
 
-        // Automatically mark unread items as Read after 1.5 seconds delay with micro-animations
-        setTimeout(async () => {
-            const unreadCards = mount.querySelectorAll('.inbox-card.unread');
-            if (unreadCards.length > 0) {
-                unreadCards.forEach(async card => {
-                    const id = card.dataset.id;
-                    try {
-                        await window.strikzDb.markInboxRead(id);
-                        
-                        const badge = card.querySelector('.badge-new-message');
-                        if (badge) {
-                            badge.style.transition = 'opacity 0.5s ease';
-                            badge.style.opacity = '0';
-                            setTimeout(() => badge.remove(), 500);
-                        }
-                        
+        // Bind Manual Mark as Read Action
+        mount.querySelectorAll('.btn-inbox-mark-read').forEach(btn => {
+            btn.onclick = async function() {
+                const id = this.dataset.id;
+                if (window.strikzPlayClickSound) window.strikzPlayClickSound();
+                try {
+                    await window.strikzDb.markInboxRead(id);
+                    
+                    const card = this.closest('.inbox-card');
+                    if (card) {
                         card.classList.remove('unread');
                         card.classList.add('read');
-                    } catch (e) {
-                        console.error('Failed to mark message as read:', e);
+                        const badge = card.querySelector('.badge-new-message');
+                        if (badge) {
+                            badge.style.transition = 'opacity 0.3s ease';
+                            badge.style.opacity = '0';
+                            setTimeout(() => badge.remove(), 300);
+                        }
                     }
-                });
-                
-                // Trigger badges count update after DB update has settled
-                setTimeout(() => {
+                    this.remove(); // Remove the button itself
                     if (window.updateInboxBadges) window.updateInboxBadges();
-                }, 200);
-            }
-        }, 1500);
+                } catch (err) {
+                    alert("Failed to mark as read: " + err.message);
+                }
+            };
+        });
     }
 
     // FRIENDS & DM TAB RENDERING
